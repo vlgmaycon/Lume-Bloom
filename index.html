@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -41,6 +40,7 @@
       background: var(--ivory);
       color: var(--ink);
       font-family: Georgia, "Times New Roman", serif;
+      position: relative;
     }
 
     button,
@@ -116,10 +116,34 @@
     }
 
     /* =========================================================
+       LOGO DE FUNDO (watermark fixo atrás de todo o conteúdo)
+    ========================================================= */
+
+    .logo-watermark {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .logo-watermark img {
+      width: min(560px, 78vw);
+      height: auto;
+      object-fit: contain;
+      opacity: 0.10;
+    }
+
+    /* =========================================================
        SITE
     ========================================================= */
 
     .main-site {
+      position: relative;
+      z-index: 1;
       width: 100%;
       min-height: 100vh;
       min-height: 100dvh;
@@ -128,39 +152,107 @@
           circle at top,
           rgba(199, 164, 106, 0.08),
           transparent 32%
-        ),
-        var(--ivory);
+        );
     }
 
     /* =========================================================
-       HEADER
+       NAVBAR
     ========================================================= */
 
-    .header {
-      position: relative;
-      z-index: 10;
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
       width: 100%;
-      padding: 28px 24px 20px;
-      text-align: center;
-      background: rgba(252, 250, 246, 0.96);
+      padding: 18px 24px;
+      background: rgba(252, 250, 246, 0.92);
       border-bottom: 1px solid rgba(59, 48, 38, 0.08);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
-    .brand {
-      color: var(--ink);
-      font-size: clamp(25px, 4vw, 42px);
-      font-weight: 400;
-      letter-spacing: 0.25em;
-      line-height: 1.1;
-      text-indent: 0.25em;
+    .navbar-brand {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
     }
 
-    .brand-subtitle {
-      margin-top: 9px;
+    .navbar-brand img {
+      display: block;
+      height: clamp(15px, 2.2vw, 21px);
+      width: auto;
+    }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(14px, 3vw, 30px);
+      list-style: none;
+    }
+
+    .navbar-link {
+      background: none;
+      border: none;
+      padding: 4px 0;
       color: var(--taupe);
-      font-size: 10px;
-      letter-spacing: 0.35em;
+      font-size: 11px;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
+      white-space: nowrap;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .navbar-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 100%;
+      bottom: -4px;
+      height: 1px;
+      background: var(--gold);
+      transition: right 0.3s ease;
+    }
+
+    .navbar-link:hover {
+      color: var(--ink);
+    }
+
+    .navbar-link:hover::after {
+      right: 0;
+    }
+
+    @media (max-width: 560px) {
+      .navbar {
+        padding: 14px 16px;
+      }
+
+      .navbar-links {
+        gap: 12px;
+      }
+
+      .navbar-link {
+        font-size: 9.5px;
+        letter-spacing: 0.08em;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .navbar-brand img {
+        height: 13px;
+      }
+
+      .navbar-links {
+        gap: 9px;
+      }
+
+      .navbar-link {
+        font-size: 8.5px;
+      }
     }
 
     /* =========================================================
@@ -211,14 +303,10 @@
       width: 100%;
       max-width: 1400px;
       margin: 0 auto;
-      padding: 0 72px;
+      padding: 0 22px;
       overflow: visible;
     }
 
-    /*
-      A viewport agora possui espaço lateral interno suficiente
-      para que o card ativo possa crescer sem ser cortado.
-    */
     .carousel-viewport {
       position: relative;
       width: 100%;
@@ -331,6 +419,8 @@
 
     /* =========================================================
        SETAS
+       Transparentes por padrão, ganham opacidade ao toque/hover,
+       e ficam mais próximas do centro (não coladas na borda).
     ========================================================= */
 
     .nav-arrow {
@@ -343,13 +433,15 @@
       width: 46px;
       height: 46px;
       margin-top: -23px;
-      border: 1px solid rgba(59, 48, 38, 0.18);
+      border: 1px solid rgba(59, 48, 38, 0.16);
       border-radius: 50%;
-      background: rgba(252, 250, 246, 0.94);
+      background: rgba(252, 250, 246, 0.85);
       color: var(--ink);
       cursor: pointer;
+      opacity: 0.38;
       box-shadow: 0 8px 24px rgba(59, 48, 38, 0.10);
       transition:
+        opacity 0.35s ease,
         background 0.25s ease,
         transform 0.25s ease,
         box-shadow 0.25s ease;
@@ -357,7 +449,10 @@
       -webkit-backdrop-filter: blur(8px);
     }
 
-    .nav-arrow:hover {
+    .nav-arrow:hover,
+    .nav-arrow:focus-visible,
+    .nav-arrow.touched {
+      opacity: 1;
       background: #ffffff;
       box-shadow: 0 12px 30px rgba(59, 48, 38, 0.16);
     }
@@ -367,11 +462,11 @@
     }
 
     .nav-arrow.left {
-      left: 12px;
+      left: 14%;
     }
 
     .nav-arrow.right {
-      right: 12px;
+      right: 14%;
     }
 
     .nav-arrow span {
@@ -419,10 +514,6 @@
     ========================================================= */
 
     @media (max-width: 768px) {
-      .header {
-        padding: 22px 18px 17px;
-      }
-
       .hero {
         padding: 42px 18px 10px;
       }
@@ -436,12 +527,8 @@
         padding-bottom: 60px;
       }
 
-      /*
-        A largura máxima agora considera explicitamente
-        o espaço das duas laterais.
-      */
       .carousel-wrapper {
-        padding: 0 58px;
+        padding: 0 8px;
       }
 
       .carousel-viewport {
@@ -469,11 +556,11 @@
       }
 
       .nav-arrow.left {
-        left: 7px;
+        left: 6%;
       }
 
       .nav-arrow.right {
-        right: 7px;
+        right: 6%;
       }
 
       .card-image {
@@ -494,16 +581,6 @@
     ========================================================= */
 
     @media (max-width: 430px) {
-      .brand {
-        font-size: 23px;
-        letter-spacing: 0.20em;
-      }
-
-      .brand-subtitle {
-        font-size: 8px;
-        letter-spacing: 0.28em;
-      }
-
       .hero {
         padding-top: 34px;
       }
@@ -513,7 +590,7 @@
       }
 
       .carousel-wrapper {
-        padding: 0 50px;
+        padding: 0 4px;
       }
 
       .carousel-viewport {
@@ -524,10 +601,6 @@
         gap: 15px;
       }
 
-      /*
-        O card nunca será maior do que a área disponível
-        entre as setas.
-      */
       .carousel-card {
         flex-basis: min(210px, calc(100vw - 112px));
         width: min(210px, calc(100vw - 112px));
@@ -545,11 +618,11 @@
       }
 
       .nav-arrow.left {
-        left: 4px;
+        left: 2%;
       }
 
       .nav-arrow.right {
-        right: 4px;
+        right: 2%;
       }
 
       .nav-arrow span {
@@ -562,10 +635,6 @@
     ========================================================= */
 
     @media (max-width: 360px) {
-      .carousel-wrapper {
-        padding: 0 46px;
-      }
-
       .carousel-viewport {
         padding-left: 10px;
         padding-right: 10px;
@@ -588,7 +657,7 @@
 
     @media (min-width: 769px) and (max-width: 1100px) {
       .carousel-wrapper {
-        padding: 0 76px;
+        padding: 0 16px;
       }
 
       .carousel-viewport {
@@ -646,17 +715,24 @@
       <source src="assets/intro.mp4" type="video/mp4">
     </video>
 
-
-<button
-  class="intro-fallback"
-  id="introFallback"
-  type="button"
->
-  Entrar na experiência
-</button>
-
-
+    <button
+      class="intro-fallback"
+      id="introFallback"
+      type="button"
+    >
+      Entrar na experiência
+    </button>
   </section>
+
+  <!-- =========================================================
+       LOGO DE FUNDO
+       Marca d'água fixa, centralizada, atrás de todo o conteúdo
+       (efeito "papel timbrado"). Fundo já removido da logo real.
+  ========================================================= -->
+
+  <div class="logo-watermark" aria-hidden="true">
+    <img src="assets/logo/logo.png" alt="">
+  </div>
 
   <!-- =========================================================
        SITE
@@ -664,164 +740,170 @@
 
   <main class="main-site">
 
+    <nav class="navbar">
+      <div class="navbar-brand">
+        <img src="assets/logo/logobarra.png" alt="Lumè Bloom">
+      </div>
 
-<header class="header">
-  <div class="brand">LUMÈ BLOOM</div>
-  <div class="brand-subtitle">Essência que Floresce</div>
-</header>
+      <ul class="navbar-links">
+        <li><button class="navbar-link" type="button">Início</button></li>
+        <li><button class="navbar-link" type="button">Loja</button></li>
+        <li><button class="navbar-link" type="button">Meus Pedidos</button></li>
+        <li><button class="navbar-link" type="button">Contato</button></li>
+      </ul>
+    </nav>
 
-<section class="hero">
-  <div class="hero-eyebrow">Uma experiência sensorial</div>
+    <section class="hero">
+      <div class="hero-eyebrow">Uma experiência sensorial</div>
 
-  <h1 class="hero-title">
-    Essência que Floresce
-  </h1>
+      <h1 class="hero-title">
+        Essência que Floresce
+      </h1>
 
-  <p class="hero-description">
-    Descubra uma coleção criada para transformar pequenos momentos
-    em experiências de cuidado, beleza e presença.
-  </p>
-</section>
+      <p class="hero-description">
+        Descubra uma coleção criada para transformar pequenos momentos
+        em experiências de cuidado, beleza e presença.
+      </p>
+    </section>
 
-<!-- =======================================================
-     CARROSSEL
-======================================================== -->
+    <!-- =======================================================
+         CARROSSEL
+    ======================================================== -->
 
-<section class="carousel-section">
+    <section class="carousel-section">
 
-  <div class="carousel-wrapper">
+      <div class="carousel-wrapper">
 
-    <button
-      class="nav-arrow left"
-      id="prevButton"
-      type="button"
-      aria-label="Produto anterior"
-    >
-      <span>‹</span>
-    </button>
+        <button
+          class="nav-arrow left"
+          id="prevButton"
+          type="button"
+          aria-label="Produto anterior"
+        >
+          <span>‹</span>
+        </button>
 
-    <div class="carousel-viewport" id="carouselViewport">
+        <div class="carousel-viewport" id="carouselViewport">
 
-      <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-track" id="carouselTrack">
 
-        <!-- SABONETES -->
-        <article class="carousel-card">
-          <div class="card-image">
-            <div class="card-placeholder">
-              Sabonetes
-            </div>
+            <!-- SABONETES -->
+            <article class="carousel-card">
+              <div class="card-image">
+                <div class="card-placeholder">
+                  Sabonetes
+                </div>
+              </div>
+
+              <div class="card-info">
+                <h2 class="card-title">
+                  Sabonetes
+                </h2>
+
+                <p class="card-description">
+                  Cuidado delicado para transformar o banho
+                  em um momento especial.
+                </p>
+              </div>
+            </article>
+
+            <!-- BODY SPLASH -->
+            <article class="carousel-card">
+              <div class="card-image">
+                <div class="card-placeholder">
+                  Body Splash
+                </div>
+              </div>
+
+              <div class="card-info">
+                <h2 class="card-title">
+                  Body Splash
+                </h2>
+
+                <p class="card-description">
+                  Fragrâncias leves para acompanhar
+                  todos os seus momentos.
+                </p>
+              </div>
+            </article>
+
+            <!-- DIFUSORES -->
+            <article class="carousel-card">
+              <div class="card-image">
+                <div class="card-placeholder">
+                  Difusores
+                </div>
+              </div>
+
+              <div class="card-info">
+                <h2 class="card-title">
+                  Difusores
+                </h2>
+
+                <p class="card-description">
+                  Aromas que transformam ambientes
+                  e despertam sensações.
+                </p>
+              </div>
+            </article>
+
+            <!-- ESCALDA-PÉS -->
+            <article class="carousel-card">
+              <div class="card-image">
+                <div class="card-placeholder">
+                  Escalda-Pés
+                </div>
+              </div>
+
+              <div class="card-info">
+                <h2 class="card-title">
+                  Escalda-Pés
+                </h2>
+
+                <p class="card-description">
+                  Um convite para desacelerar,
+                  respirar e cuidar de si.
+                </p>
+              </div>
+            </article>
+
+            <!-- KITS -->
+            <article class="carousel-card">
+              <div class="card-image">
+                <div class="card-placeholder">
+                  Kits Especiais
+                </div>
+              </div>
+
+              <div class="card-info">
+                <h2 class="card-title">
+                  Kits Especiais
+                </h2>
+
+                <p class="card-description">
+                  Combinações pensadas para presentear
+                  e criar memórias.
+                </p>
+              </div>
+            </article>
+
           </div>
+        </div>
 
-          <div class="card-info">
-            <h2 class="card-title">
-              Sabonetes
-            </h2>
-
-            <p class="card-description">
-              Cuidado delicado para transformar o banho
-              em um momento especial.
-            </p>
-          </div>
-        </article>
-
-        <!-- BODY SPLASH -->
-        <article class="carousel-card">
-          <div class="card-image">
-            <div class="card-placeholder">
-              Body Splash
-            </div>
-          </div>
-
-          <div class="card-info">
-            <h2 class="card-title">
-              Body Splash
-            </h2>
-
-            <p class="card-description">
-              Fragrâncias leves para acompanhar
-              todos os seus momentos.
-            </p>
-          </div>
-        </article>
-
-        <!-- DIFUSORES -->
-        <article class="carousel-card">
-          <div class="card-image">
-            <div class="card-placeholder">
-              Difusores
-            </div>
-          </div>
-
-          <div class="card-info">
-            <h2 class="card-title">
-              Difusores
-            </h2>
-
-            <p class="card-description">
-              Aromas que transformam ambientes
-              e despertam sensações.
-            </p>
-          </div>
-        </article>
-
-        <!-- ESCALDA-PÉS -->
-        <article class="carousel-card">
-          <div class="card-image">
-            <div class="card-placeholder">
-              Escalda-Pés
-            </div>
-          </div>
-
-          <div class="card-info">
-            <h2 class="card-title">
-              Escalda-Pés
-            </h2>
-
-            <p class="card-description">
-              Um convite para desacelerar,
-              respirar e cuidar de si.
-            </p>
-          </div>
-        </article>
-
-        <!-- KITS -->
-        <article class="carousel-card">
-          <div class="card-image">
-            <div class="card-placeholder">
-              Kits Especiais
-            </div>
-          </div>
-
-          <div class="card-info">
-            <h2 class="card-title">
-              Kits Especiais
-            </h2>
-
-            <p class="card-description">
-              Combinações pensadas para presentear
-              e criar memórias.
-            </p>
-          </div>
-        </article>
+        <button
+          class="nav-arrow right"
+          id="nextButton"
+          type="button"
+          aria-label="Próximo produto"
+        >
+          <span>›</span>
+        </button>
 
       </div>
-    </div>
 
-    <button
-      class="nav-arrow right"
-      id="nextButton"
-      type="button"
-      aria-label="Próximo produto"
-    >
-      <span>›</span>
-    </button>
+      <div class="carousel-dots" id="carouselDots"></div>
 
-  </div>
-
-  <div class="carousel-dots" id="carouselDots"></div>
-
-</section>
-
+    </section>
 
   </main>
 
@@ -837,31 +919,21 @@
     let introClosed = false;
 
     function closeIntro() {
-      if (introClosed) {
-        return;
-      }
-
+      if (introClosed) return;
       introClosed = true;
-
       introScreen.classList.add("hidden");
-
       setTimeout(() => {
         introScreen.style.display = "none";
       }, 850);
     }
 
     function showIntroFallback() {
-      if (introClosed) {
-        return;
-      }
-
+      if (introClosed) return;
       introFallback.classList.add("visible");
     }
 
     function tryPlayIntro() {
-      if (introClosed) {
-        return;
-      }
+      if (introClosed) return;
 
       introVideo.muted = true;
       introVideo.defaultMuted = true;
@@ -882,22 +954,12 @@
     }
 
     introVideo.addEventListener("ended", closeIntro);
-
-    introVideo.addEventListener("canplay", () => {
-      tryPlayIntro();
-    });
-
-    introVideo.addEventListener("loadeddata", () => {
-      tryPlayIntro();
-    });
-
-    introVideo.addEventListener("error", () => {
-      showIntroFallback();
-    });
+    introVideo.addEventListener("canplay", tryPlayIntro);
+    introVideo.addEventListener("loadeddata", tryPlayIntro);
+    introVideo.addEventListener("error", showIntroFallback);
 
     introFallback.addEventListener("click", () => {
       introVideo.muted = true;
-
       introVideo
         .play()
         .then(() => {
@@ -909,9 +971,7 @@
     });
 
     window.addEventListener("load", () => {
-      setTimeout(() => {
-        tryPlayIntro();
-      }, 80);
+      setTimeout(tryPlayIntro, 80);
     });
 
     document.addEventListener(
@@ -921,14 +981,18 @@
           tryPlayIntro();
         }
       },
-      {
-        once: true,
-        passive: true
-      }
+      { once: true, passive: true }
     );
 
     /* =========================================================
-       CARROSSEL
+       CARROSSEL — loop infinito suave
+       Estratégia: 3 cópias do conjunto original (antes / meio /
+       depois). Navegamos livremente pelo índice; ao fim de cada
+       transição (transitionend), se saímos do bloco do meio,
+       "teletransportamos" sem animação de volta para o bloco
+       do meio na posição equivalente. Como isso acontece só
+       depois que a transição já terminou (fora da área visível
+       de qualquer diferença perceptível), não há pulo nem trava.
     ========================================================= */
 
     const viewport = document.getElementById("carouselViewport");
@@ -937,215 +1001,95 @@
     const nextButton = document.getElementById("nextButton");
     const dotsContainer = document.getElementById("carouselDots");
 
-    let originalCards = Array.from(
-      track.querySelectorAll(".carousel-card")
-    );
+    const originalCards = Array.from(track.querySelectorAll(".carousel-card"));
+    const cardsPerSet = originalCards.length;
 
-    let currentIndex = 0;
-    let cardsPerSet = originalCards.length;
-    let isMoving = false;
+    let currentIndex = cardsPerSet;
+    let isAnimating = false;
+    let currentTransform = 0;
 
-    /*
-      Clona os cards para criar o efeito infinito.
-    */
-    function createInfiniteCarousel() {
+    function buildInfiniteTrack() {
       track.innerHTML = "";
 
-      const before = originalCards.map(card => {
-        return card.cloneNode(true);
-      });
+      const sets = [
+        originalCards.map(c => c.cloneNode(true)),
+        originalCards.map(c => c.cloneNode(true)),
+        originalCards.map(c => c.cloneNode(true))
+      ];
 
-      const middle = originalCards.map(card => {
-        return card.cloneNode(true);
-      });
-
-      const after = originalCards.map(card => {
-        return card.cloneNode(true);
-      });
-
-      before.forEach(card => track.appendChild(card));
-      middle.forEach(card => track.appendChild(card));
-      after.forEach(card => track.appendChild(card));
-
-      currentIndex = cardsPerSet;
-
-      requestAnimationFrame(() => {
-        updateCarousel(false);
-      });
+      sets.forEach(set => set.forEach(card => track.appendChild(card)));
     }
 
     function getCards() {
-      return Array.from(
-        track.querySelectorAll(".carousel-card")
-      );
+      return Array.from(track.querySelectorAll(".carousel-card"));
     }
 
     function getGap() {
       const cards = getCards();
-
-      if (cards.length < 2) {
-        return 0;
-      }
-
-      const firstRect = cards[0].getBoundingClientRect();
-      const secondRect = cards[1].getBoundingClientRect();
-
-      return Math.max(
-        0,
-        secondRect.left - firstRect.right
-      );
+      if (cards.length < 2) return 0;
+      const a = cards[0].getBoundingClientRect();
+      const b = cards[1].getBoundingClientRect();
+      return Math.max(0, b.left - a.right);
     }
 
     function updateActiveCard() {
       const cards = getCards();
-
       cards.forEach((card, index) => {
-        card.classList.toggle(
-          "active",
-          index === currentIndex
-        );
+        card.classList.toggle("active", index === currentIndex);
       });
     }
 
     function updateDots() {
-      const realIndex =
-        ((currentIndex - cardsPerSet) % cardsPerSet + cardsPerSet) %
-        cardsPerSet;
-
-      const dots = Array.from(
-        dotsContainer.children
-      );
-
-      dots.forEach((dot, index) => {
-        dot.classList.toggle(
-          "active",
-          index === realIndex
-        );
+      const realIndex = ((currentIndex - cardsPerSet) % cardsPerSet + cardsPerSet) % cardsPerSet;
+      Array.from(dotsContainer.children).forEach((dot, index) => {
+        dot.classList.toggle("active", index === realIndex);
       });
     }
 
-    function updateCarousel(animate = true) {
-      const cards = getCards();
-
-      if (!cards.length) {
-        return;
-      }
-
-      const activeCard = cards[currentIndex];
-
-      if (!activeCard) {
-        return;
-      }
-
-      const viewportRect =
-        viewport.getBoundingClientRect();
-
-      const cardRect =
-        activeCard.getBoundingClientRect();
-
-      const cardCenter =
-        cardRect.left + cardRect.width / 2;
-
-      const viewportCenter =
-        viewportRect.left + viewportRect.width / 2;
-
-      const currentTransform =
-        parseFloat(
-          track.dataset.currentTransform || "0"
-        );
-
-      const correction =
-        viewportCenter - cardCenter;
-
-      const newTransform =
-        currentTransform + correction;
-
-      track.style.transition = animate
-        ? "transform 0.55s ease"
-        : "none";
-
-      track.style.transform =
-        "translate3d(" +
-        newTransform +
-        "px, 0, 0)";
-
-      track.dataset.currentTransform =
-        newTransform;
-
-      updateActiveCard();
-      updateDots();
-    }
-
-    /*
-      Recalcula a posição de forma absoluta.
-      Isso evita que pequenos erros acumulados façam
-      o carrossel deslocar para um dos lados.
-    */
-    function centerCurrentCard(animate = true) {
+    function applyTransform(animate) {
       const cards = getCards();
       const activeCard = cards[currentIndex];
+      if (!activeCard) return;
 
-      if (!activeCard) {
-        return;
-      }
-
-      const cardWidth =
-        activeCard.getBoundingClientRect().width;
-
+      const cardWidth = activeCard.getBoundingClientRect().width;
       const gap = getGap();
+      const viewportWidth = viewport.getBoundingClientRect().width;
+      const wrapperOffset = viewportWidth / 2 - cardWidth / 2;
+      const distance = currentIndex * (cardWidth + gap);
+      const transform = Math.round(wrapperOffset - distance);
 
-      const viewportWidth =
-        viewport.getBoundingClientRect().width;
+      currentTransform = transform;
 
-      const wrapperOffset =
-        viewportWidth / 2 -
-        cardWidth / 2;
-
-      const distance =
-        currentIndex * (cardWidth + gap);
-
-      const transform =
-        wrapperOffset - distance;
-
-      track.style.transition = animate
-        ? "transform 0.55s ease"
-        : "none";
-
-      track.style.transform =
-        "translate3d(" +
-        transform +
-        "px, 0, 0)";
-
-      track.dataset.currentTransform =
-        transform;
+      track.style.transition = animate ? "transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1)" : "none";
+      track.style.transform = "translate3d(" + transform + "px, 0, 0)";
 
       updateActiveCard();
       updateDots();
     }
+
+    function handleTransitionEnd(event) {
+      if (event.target !== track || event.propertyName !== "transform") return;
+
+      // Se saiu do bloco do meio, reposiciona sem animação (invisível ao usuário,
+      // pois o card já está centralizado e a troca é instantânea).
+      if (currentIndex >= cardsPerSet * 2) {
+        currentIndex -= cardsPerSet;
+        applyTransform(false);
+      } else if (currentIndex < cardsPerSet) {
+        currentIndex += cardsPerSet;
+        applyTransform(false);
+      }
+
+      isAnimating = false;
+    }
+
+    track.addEventListener("transitionend", handleTransitionEnd);
 
     function moveTo(index) {
-      if (isMoving) {
-        return;
-      }
-
-      isMoving = true;
+      if (isAnimating) return;
+      isAnimating = true;
       currentIndex = index;
-
-      centerCurrentCard(true);
-
-      setTimeout(() => {
-        if (currentIndex >= cardsPerSet * 2) {
-          currentIndex -= cardsPerSet;
-          centerCurrentCard(false);
-        }
-
-        if (currentIndex < cardsPerSet) {
-          currentIndex += cardsPerSet;
-          centerCurrentCard(false);
-        }
-
-        isMoving = false;
-      }, 580);
+      applyTransform(true);
     }
 
     function nextCard() {
@@ -1156,15 +1100,22 @@
       moveTo(currentIndex - 1);
     }
 
-    prevButton.addEventListener(
-      "click",
-      previousCard
-    );
+    prevButton.addEventListener("click", previousCard);
+    nextButton.addEventListener("click", nextCard);
 
-    nextButton.addEventListener(
-      "click",
-      nextCard
-    );
+    /* Setas: opacidade sobe ao toque em telas touch, some depois */
+    [prevButton, nextButton].forEach(btn => {
+      btn.addEventListener(
+        "touchstart",
+        () => btn.classList.add("touched"),
+        { passive: true }
+      );
+      btn.addEventListener(
+        "touchend",
+        () => setTimeout(() => btn.classList.remove("touched"), 900),
+        { passive: true }
+      );
+    });
 
     /* =========================================================
        DOTS
@@ -1172,23 +1123,12 @@
 
     function createDots() {
       dotsContainer.innerHTML = "";
-
       for (let i = 0; i < cardsPerSet; i++) {
-        const dot =
-          document.createElement("button");
-
+        const dot = document.createElement("button");
         dot.type = "button";
         dot.className = "carousel-dot";
-
-        dot.setAttribute(
-          "aria-label",
-          "Ir para produto " + (i + 1)
-        );
-
-        dot.addEventListener("click", () => {
-          moveTo(cardsPerSet + i);
-        });
-
+        dot.setAttribute("aria-label", "Ir para produto " + (i + 1));
+        dot.addEventListener("click", () => moveTo(cardsPerSet + i));
         dotsContainer.appendChild(dot);
       }
     }
@@ -1198,41 +1138,25 @@
     ========================================================= */
 
     let touchStartX = 0;
-    let touchEndX = 0;
 
     viewport.addEventListener(
       "touchstart",
       event => {
-        touchStartX =
-          event.changedTouches[0].screenX;
+        touchStartX = event.changedTouches[0].screenX;
       },
-      {
-        passive: true
-      }
+      { passive: true }
     );
 
     viewport.addEventListener(
       "touchend",
       event => {
-        touchEndX =
-          event.changedTouches[0].screenX;
-
-        const distance =
-          touchEndX - touchStartX;
-
-        if (Math.abs(distance) < 45) {
-          return;
-        }
-
-        if (distance < 0) {
-          nextCard();
-        } else {
-          previousCard();
-        }
+        const touchEndX = event.changedTouches[0].screenX;
+        const distance = touchEndX - touchStartX;
+        if (Math.abs(distance) < 45) return;
+        if (distance < 0) nextCard();
+        else previousCard();
       },
-      {
-        passive: true
-      }
+      { passive: true }
     );
 
     /* =========================================================
@@ -1241,40 +1165,32 @@
 
     let resizeTimer;
 
-    window.addEventListener(
-      "resize",
-      () => {
-        clearTimeout(resizeTimer);
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => applyTransform(false), 120);
+    });
 
-        resizeTimer = setTimeout(() => {
-          centerCurrentCard(false);
-        }, 120);
-      }
-    );
-
-    window.addEventListener(
-      "orientationchange",
-      () => {
-        setTimeout(() => {
-          centerCurrentCard(false);
-        }, 250);
-      }
-    );
+    window.addEventListener("orientationchange", () => {
+      setTimeout(() => applyTransform(false), 250);
+    });
 
     /* =========================================================
        INICIALIZAÇÃO
     ========================================================= */
 
+    buildInfiniteTrack();
     createDots();
-    createInfiniteCarousel();
+    applyTransform(false);
 
-    setTimeout(() => {
-      centerCurrentCard(false);
-    }, 100);
+    // Pequenos ajustes de segurança após fontes/imagens/layout assentarem
+    setTimeout(() => applyTransform(false), 150);
+    setTimeout(() => applyTransform(false), 500);
 
-    setTimeout(() => {
-      centerCurrentCard(false);
-    }, 500);
+    window.addEventListener("load", () => applyTransform(false));
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => applyTransform(false));
+    }
   </script>
 
 </body>
