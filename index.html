@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#E6E3DB">
+  <title>LUMÈ BLOOM — Essência que Floresce</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --champagne: #E6E3DB;
+      --ivory: #FCFAF6;
+      --ink: #3B3026;
+      --taupe: #756A5D;
+      --champagne-gold: #C7A46A;
+      --line: rgba(36, 35, 30, 0.12);
+      --shadow: 0 16px 45px rgba(61, 52, 39, 0.12);
+    }
+
+    body {
+      background-color: var(--champagne);
+      color: var(--ink);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* TELA DE INTRODUÇÃO (VÍDEO RESPONSIVO) */
+    .intro-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #E8E4DC; /* Fundo idêntico à tonalidade do vídeo */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      transition: transform 1.2s cubic-bezier(0.77, 0, 0.175, 1);
+      overflow: hidden;
+    }
+
+    .intro-video {
+      width: 100%;
+      height: 100%;
+      /* Preenche toda a tela. Se preferir ver o vídeo sem nenhum corte nas laterais no celular, mude para: contain */
+      object-fit: cover; 
+      object-position: center;
+      display: block;
+    }
+
+    .skip-btn {
+      position: absolute;
+      bottom: 30px;
+      right: 30px;
+      background: rgba(252, 250, 246, 0.85);
+      border: 1px solid var(--line);
+      padding: 10px 22px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+      cursor: pointer;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .skip-btn:hover {
+      background: var(--ivory);
+      border-color: var(--champagne-gold);
+    }
+
+    .intro-up {
+      transform: translateY(-100vh);
+    }
+
+    /* ESTRUTURA DO SITE PRINCIPAL */
+    .main-site {
+      opacity: 0;
+      transition: opacity 1s ease 0.2s;
+      min-height: 100vh;
+      background: var(--champagne);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .site-visible {
+      opacity: 1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 50px;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      background: rgba(230, 227, 219, 0.98);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      z-index: 100;
+    }
+
+    .nav-logo {
+      font-family: 'Bodoni Moda', serif;
+      font-size: 1.95rem;
+      font-weight: 600;
+      color: #3B3026;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 30px;
+      align-items: center;
+    }
+
+    nav a {
+      color: #5A4A3A;
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* SEÇÃO DO CARROSSEL */
+    .page-section {
+      flex: 1;
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 0;
+      position: relative;
+      background: var(--champagne);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .carousel-wrapper {
+      width: 100%;
+      max-width: 1000px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .carousel-viewport {
+      width: 100%;
+      overflow: hidden;
+      padding: 50px 0;
+    }
+
+    .carousel-track {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      will-change: transform;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .carousel-track.no-transition {
+      transition: none !important;
+    }
+
+    .carousel-card {
+      flex: 0 0 280px;
+      width: 280px;
+      background: var(--ivory);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid rgba(36, 35, 30, 0.08);
+      text-align: center;
+      transform: scale(0.85);
+      filter: blur(3px);
+      opacity: 0.5;
+      transition: transform 0.3s ease, filter 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      user-select: none;
+    }
+
+    .carousel-card.active {
+      transform: scale(1.12);
+      filter: blur(0);
+      opacity: 1;
+      box-shadow: var(--shadow);
+      border-color: var(--champagne-gold);
+      z-index: 5;
+    }
+
+    .card-photo {
+      width: 100%;
+      height: 280px;
+      background: linear-gradient(135deg, #E2DDD3, #D0C9BB);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--taupe);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .card-title { font-family: 'Bodoni Moda', serif; font-size: 1.25rem; color: var(--ink); margin-bottom: 6px; }
+    .card-desc { font-size: 0.75rem; color: var(--taupe); letter-spacing: 1px; }
+
+    .nav-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(252, 250, 246, 0.9);
+      border: 1px solid var(--line);
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      color: var(--ink);
+      cursor: pointer;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.2s, border-color 0.2s;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+
+    .nav-arrow:hover { background: var(--ivory); border-color: var(--champagne-gold); transform: translateY(-50%) scale(1.08); }
+    .nav-arrow.left { left: 40px; }
+    .nav-arrow.right { right: 40px; }
+
+    footer {
+      border-top: 1px solid rgba(36,35,30,0.08);
+      padding: 32px 28px;
+      text-align: center;
+      color: var(--taupe);
+      background: var(--champagne);
+    }
+    .footer-logo { font-family: 'Bodoni Moda', serif; font-size: 1.5rem; font-weight: 600; color: #3B3026; margin-bottom: 8px; }
+    .footer-tagline { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; }
+
+    /* AJUSTES PARA CELULAR */
+    @media (max-width: 768px) {
+      header { padding: 18px 24px; }
+      .nav-arrow.left { left: 15px; }
+      .nav-arrow.right { right: 15px; }
+      .carousel-card { flex: 0 0 240px; width: 240px; }
+      .skip-btn { bottom: 20px; right: 20px; padding: 8px 18px; font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="intro-screen" id="introScreen">
+    <video class="intro-video" id="introVideo" autoplay muted playsinline>
+      <source src="assets/intro.mp4" type="video/mp4">
+      Seu navegador não suporta vídeos HTML5.
+    </video>
+    <button class="skip-btn" onclick="closeIntro()">Pular</button>
+  </div>
+
+  <div class="main-site" id="mainSite">
+    <header>
+      <a href="#" class="nav-logo">Lum<span>è</span> Bloom</a>
+      <nav>
+        <ul><li><a href="#colecao">Coleção</a></li></ul>
+      </nav>
+    </header>
+
+    <section class="page-section" id="colecao">
+      <div class="carousel-wrapper">
+        <button class="nav-arrow left" onclick="moveCarousel(-1)" aria-label="Anterior">&#10094;</button>
+
+        <div class="carousel-viewport" id="viewport">
+          <div class="carousel-track" id="carouselTrack">
+            <div class="carousel-card"><div class="card-photo">Sabonetes</div><h3 class="card-title">Sabonetes</h3><p class="card-desc">Cuidados delicados para a pele</p></div>
+            <div class="carousel-card"><div class="card-photo">Body Splash</div><h3 class="card-title">Body Splash</h3><p class="card-desc">Frescor radiante e duradouro</p></div>
+            <div class="carousel-card"><div class="card-photo">Difusores</div><h3 class="card-title">Difusores</h3><p class="card-desc">Essência viva no seu ambiente</p></div>
+            <div class="carousel-card"><div class="card-photo">Escalda-Pés</div><h3 class="card-title">Escalda-Pés</h3><p class="card-desc">Rituais de relaxamento puro</p></div>
+            <div class="carousel-card"><div class="card-photo">Kits Especiais</div><h3 class="card-title">Kits Especiais</h3><p class="card-desc">Presentes inesquecíveis</p></div>
+          </div>
+        </div>
+
+        <button class="nav-arrow right" onclick="moveCarousel(1)" aria-label="Próximo">&#10095;</button>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">Lumè Bloom</div>
+      <div class="footer-tagline">Essência que floresce</div>
+    </footer>
+  </div>
+
+  <script>
+    const introVideo = document.getElementById('introVideo');
+    const introScreen = document.getElementById('introScreen');
+    const mainSite = document.getElementById('mainSite');
+
+    // Transição automática quando o vídeo termina
+    introVideo.addEventListener('ended', closeIntro);
+
+    function closeIntro() {
+      introScreen.classList.add('intro-up');
+      mainSite.classList.add('site-visible');
+      initInfiniteCarousel();
+    }
+
+    // CARROSSEL INFINITO
+    let track, viewport, allCards;
+    let realCount = 0;
+    let currentIndex = 0;
+    let isMoving = false;
+    let cardWidth = 280;
+    const gap = 30;
+
+    function initInfiniteCarousel() {
+      track = document.getElementById('carouselTrack');
+      viewport = document.getElementById('viewport');
+      
+      if (!track || track.children.length === 0) return;
+
+      const originalCards = Array.from(track.children);
+      realCount = originalCards.length;
+
+      const clonesBefore = originalCards.map(card => card.cloneNode(true));
+      const clonesAfter = originalCards.map(card => card.cloneNode(true));
+
+      clonesBefore.forEach(clone => track.insertBefore(clone, track.firstChild));
+      clonesAfter.forEach(clone => track.appendChild(clone));
+
+      allCards = Array.from(track.children);
+      currentIndex = realCount;
+
+      updatePosition(false);
+
+      track.addEventListener('transitionend', () => {
+        isMoving = false;
+        
+        if (currentIndex >= realCount * 2) {
+          currentIndex -= realCount;
+          updatePosition(false);
+        } else if (currentIndex < realCount) {
+          currentIndex += realCount;
+          updatePosition(false);
+        }
+      });
+    }
+
+    function updatePosition(animate = true) {
+      if (!allCards) return;
+
+      // Ajusta dinamicamente a largura do card em telas menores
+      cardWidth = allCards[0].offsetWidth;
+
+      allCards.forEach((card, index) => {
+        if (index === currentIndex) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+
+      if (!animate) {
+        track.classList.add('no-transition');
+      } else {
+        track.classList.remove('no-transition');
+      }
+
+      const viewportWidth = viewport.offsetWidth;
+      const itemOffset = currentIndex * (cardWidth + gap);
+      const centerOffset = (viewportWidth / 2) - (cardWidth / 2);
+      const targetX = centerOffset - itemOffset;
+
+      track.style.transform = `translateX(${targetX}px)`;
+
+      if (!animate) {
+        void track.offsetHeight;
+        track.classList.remove('no-transition');
+      }
+    }
+
+    function moveCarousel(direction) {
+      if (isMoving) return;
+      isMoving = true;
+      currentIndex += direction;
+      updatePosition(true);
+    }
+
+    window.addEventListener('resize', () => {
+      updatePosition(false);
+    });
+  </script>
+
+</body>
+</html>
