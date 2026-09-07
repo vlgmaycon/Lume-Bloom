@@ -41,7 +41,8 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: #E8E4DC; /* Fundo idêntico à tonalidade do vídeo */
+      height: 100dvh; /* Garante cálculo correto em telas móbiles com barra de navegação */
+      background: #E8E4DC;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -53,7 +54,6 @@
     .intro-video {
       width: 100%;
       height: 100%;
-      /* Preenche toda a tela. Se preferir ver o vídeo sem nenhum corte nas laterais no celular, mude para: contain */
       object-fit: cover; 
       object-position: center;
       display: block;
@@ -270,14 +270,24 @@
 </head>
 <body>
 
+  <!-- TELA DE INTRODUÇÃO -->
   <div class="intro-screen" id="introScreen">
-    <video class="intro-video" id="introVideo" autoplay muted playsinline>
+    <video 
+      class="intro-video" 
+      id="introVideo" 
+      autoplay 
+      muted 
+      playsinline 
+      webkit-playsinline 
+      preload="auto"
+    >
       <source src="assets/intro.mp4" type="video/mp4">
       Seu navegador não suporta vídeos HTML5.
     </video>
     <button class="skip-btn" onclick="closeIntro()">Pular</button>
   </div>
 
+  <!-- SITE PRINCIPAL -->
   <div class="main-site" id="mainSite">
     <header>
       <a href="#" class="nav-logo">Lum<span>è</span> Bloom</a>
@@ -314,6 +324,15 @@
     const introVideo = document.getElementById('introVideo');
     const introScreen = document.getElementById('introScreen');
     const mainSite = document.getElementById('mainSite');
+
+    // Força o início do vídeo imediatamente (resolve restrições do Safari/iOS)
+    window.addEventListener('load', () => {
+      if (introVideo) {
+        introVideo.play().catch(error => {
+          console.log("Autoplay bloqueado pelo sistema móvel, aguardando interação:", error);
+        });
+      }
+    });
 
     // Transição automática quando o vídeo termina
     introVideo.addEventListener('ended', closeIntro);
@@ -368,7 +387,6 @@
     function updatePosition(animate = true) {
       if (!allCards) return;
 
-      // Ajusta dinamicamente a largura do card em telas menores
       cardWidth = allCards[0].offsetWidth;
 
       allCards.forEach((card, index) => {
