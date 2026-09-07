@@ -917,28 +917,48 @@
     const introFallback = document.getElementById("introFallback");
 
     let introClosed = false;
+    let playAttempts = 0;
+    let fallbackTimer = null;
+
+    // Reforça mudo/inline como PROPRIEDADE (não só atributo) o quanto antes.
+    // Em vários navegadores mobile (iOS Safari, WebViews de apps), isso
+    // precisa estar setado via JS logo no início para o autoplay ser aceito.
+    introVideo.muted = true;
+    introVideo.defaultMuted = true;
+    introVideo.playsInline = true;
+    introVideo.setAttribute("muted", "");
+    introVideo.setAttribute("playsinline", "");
+    introVideo.setAttribute("webkit-playsinline", "");
 
     function closeIntro() {
       if (introClosed) return;
       introClosed = true;
+      clearTimeout(fallbackTimer);
       introScreen.classList.add("hidden");
       setTimeout(() => {
         introScreen.style.display = "none";
       }, 850);
     }
 
-    function showIntroFallback() {
-      if (introClosed) return;
-      introFallback.classList.add("visible");
+    function scheduleFallback() {
+      // Só mostra o botão manual se, depois de várias tentativas e um
+      // tempo razoável, o vídeo continuar pausado — evita o botão
+      // aparecer por causa de uma falha passageira na primeira tentativa.
+      clearTimeout(fallbackTimer);
+      fallbackTimer = setTimeout(() => {
+        if (!introClosed && introVideo.paused) {
+          introFallback.classList.add("visible");
+        }
+      }, 1800);
     }
 
     function tryPlayIntro() {
-      if (introClosed) return;
+      if (introClosed || !introVideo.paused) return;
+
+      playAttempts += 1;
 
       introVideo.muted = true;
-      introVideo.defaultMuted = true;
-      introVideo.setAttribute("muted", "");
-      introVideo.setAttribute("playsinline", "");
+      introVideo.playsInline = true;
 
       const playPromise = introVideo.play();
 
@@ -946,17 +966,31 @@
         playPromise
           .then(() => {
             introFallback.classList.remove("visible");
+            clearTimeout(fallbackTimer);
           })
           .catch(() => {
-            showIntroFallback();
+            // Tenta de novo algumas vezes antes de admitir derrota —
+            // em redes mais lentas a primeira tentativa costuma falhar
+            // só porque o vídeo ainda não tinha dados suficientes.
+            if (playAttempts < 6) {
+              setTimeout(tryPlayIntro, 350);
+            }
+            scheduleFallback();
           });
       }
     }
 
     introVideo.addEventListener("ended", closeIntro);
-    introVideo.addEventListener("canplay", tryPlayIntro);
+    introVideo.addEventListener("loadedmetadata", tryPlayIntro);
     introVideo.addEventListener("loadeddata", tryPlayIntro);
-    introVideo.addEventListener("error", showIntroFallback);
+    introVideo.addEventListener("canplay", tryPlayIntro);
+    introVideo.addEventListener("canplaythrough", tryPlayIntro);
+    introVideo.addEventListener("playing", () => {
+      introFallback.classList.remove("visible");
+      clearTimeout(fallbackTimer);
+    });
+    introVideo.addEventListener("error", scheduleFallback);
+    introVideo.addEventListener("stalled", scheduleFallback);
 
     introFallback.addEventListener("click", () => {
       introVideo.muted = true;
@@ -970,9 +1004,20 @@
         });
     });
 
-    window.addEventListener("load", () => {
-      setTimeout(tryPlayIntro, 80);
+    // Dispara assim que o script roda (não espera a página inteira
+    // carregar — em conexões móveis mais lentas isso atrasava demais
+    // a primeira tentativa de autoplay).
+    tryPlayIntro();
+    scheduleFallback();
+
+    // Tenta de novo se a aba estava em segundo plano/minimizada e voltou.
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        tryPlayIntro();
+      }
     });
+
+    window.addEventListener("pageshow", tryPlayIntro);
 
     document.addEventListener(
       "touchstart",
