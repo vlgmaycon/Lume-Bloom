@@ -103,7 +103,7 @@
     }
 
     .intro-fallback.visible {
-      display: flex;
+      display: none !important;
     }
 
     .intro-screen.hidden {
@@ -114,30 +114,7 @@
         opacity 0.8s ease,
         visibility 0.8s ease;
     }
-
-    /* =========================================================
-       LOGO DE FUNDO (watermark fixo atrás de todo o conteúdo)
-    ========================================================= */
-
-    .logo-watermark {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-      overflow: hidden;
-    }
-
-    .logo-watermark img {
-      width: min(560px, 78vw);
-      height: auto;
-      object-fit: contain;
-      opacity: 0.10;
-    }
-
-    /* =========================================================
+/* =========================================================
        SITE
     ========================================================= */
 
@@ -712,7 +689,7 @@
       disableremoteplayback
       aria-hidden="true"
     >
-      <source src="assets/intro.mp4" type="video/mp4">
+      <source id="introSource" src="assets/intro.mp4" type="video/mp4">
     </video>
 
     <button
@@ -729,12 +706,7 @@
        Marca d'água fixa, centralizada, atrás de todo o conteúdo
        (efeito "papel timbrado"). Fundo já removido da logo real.
   ========================================================= -->
-
-  <div class="logo-watermark" aria-hidden="true">
-    <img src="assets/logo/logo.png" alt="">
-  </div>
-
-  <!-- =========================================================
+<!-- =========================================================
        SITE
   ========================================================= -->
 
@@ -909,108 +881,136 @@
 
   <script>
     /* =========================================================
-       INTRO
+       INTRO — AUTOPLAY + FORMATO RESPONSIVO
+       - Desktop: assets/intro.mp4  (16:9)
+       - Tablet:  assets/intro-tablet.mp4 (idealmente 4:3)
+       - Celular: assets/intro-mobile.mp4 (idealmente 9:16)
+       - Se a versão específica não existir, volta automaticamente
+         para o vídeo desktop original.
     ========================================================= */
 
     const introScreen = document.getElementById("introScreen");
     const introVideo = document.getElementById("introVideo");
     const introFallback = document.getElementById("introFallback");
+    const introSource = document.getElementById("introSource");
 
     let introClosed = false;
-    let playAttempts = 0;
-    let fallbackTimer = null;
+    let introPlayTimer = null;
+    let introFallbackAttempted = false;
 
-    // Reforça mudo/inline como PROPRIEDADE (não só atributo) o quanto antes.
-    // Em vários navegadores mobile (iOS Safari, WebViews de apps), isso
-    // precisa estar setado via JS logo no início para o autoplay ser aceito.
     introVideo.muted = true;
     introVideo.defaultMuted = true;
     introVideo.playsInline = true;
+    introVideo.autoplay = true;
+    introVideo.controls = false;
+
     introVideo.setAttribute("muted", "");
+    introVideo.setAttribute("autoplay", "");
     introVideo.setAttribute("playsinline", "");
     introVideo.setAttribute("webkit-playsinline", "");
+    introVideo.setAttribute("disablepictureinpicture", "");
+    introVideo.setAttribute("disableremoteplayback", "");
+
+    function getIntroSource() {
+      const width = window.innerWidth;
+
+      if (width <= 600) {
+        return "assets/intro-mobile.mp4";
+      }
+
+      if (width <= 1100) {
+        return "assets/intro-tablet.mp4";
+      }
+
+      return "assets/intro.mp4";
+    }
+
+    function setIntroSource() {
+      const desiredSource = getIntroSource();
+      const desktopSource = "assets/intro.mp4";
+
+      if (!introSource) return;
+
+      introFallbackAttempted = false;
+      introSource.src = desiredSource;
+
+      introVideo.load();
+
+      // Se o arquivo específico de celular/tablet não existir,
+      // o evento error abaixo troca para o desktop.
+      introVideo.dataset.desktopSource = desktopSource;
+    }
+
+    function scrollSiteToTop() {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
 
     function closeIntro() {
       if (introClosed) return;
+
       introClosed = true;
-      clearTimeout(fallbackTimer);
+      clearTimeout(introPlayTimer);
+
+      scrollSiteToTop();
       introScreen.classList.add("hidden");
+
       setTimeout(() => {
         introScreen.style.display = "none";
+        scrollSiteToTop();
       }, 850);
     }
 
-    function scheduleFallback() {
-      // Só mostra o botão manual se, depois de várias tentativas e um
-      // tempo razoável, o vídeo continuar pausado — evita o botão
-      // aparecer por causa de uma falha passageira na primeira tentativa.
-      clearTimeout(fallbackTimer);
-      fallbackTimer = setTimeout(() => {
-        if (!introClosed && introVideo.paused) {
-          introFallback.classList.add("visible");
-        }
-      }, 1800);
-    }
-
     function tryPlayIntro() {
-      if (introClosed || !introVideo.paused) return;
-
-      playAttempts += 1;
+      if (introClosed || !introVideo) return;
 
       introVideo.muted = true;
+      introVideo.defaultMuted = true;
       introVideo.playsInline = true;
 
       const playPromise = introVideo.play();
 
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            introFallback.classList.remove("visible");
-            clearTimeout(fallbackTimer);
-          })
-          .catch(() => {
-            // Tenta de novo algumas vezes antes de admitir derrota —
-            // em redes mais lentas a primeira tentativa costuma falhar
-            // só porque o vídeo ainda não tinha dados suficientes.
-            if (playAttempts < 6) {
-              setTimeout(tryPlayIntro, 350);
+      if (playPromise && typeof playPromise.catch === "function") {
+        playPromise.catch(() => {
+          // O navegador ainda pode estar aguardando dados.
+          // Não mostramos botão: tentamos novamente silenciosamente.
+          clearTimeout(introPlayTimer);
+
+          introPlayTimer = setTimeout(() => {
+            if (!introClosed && introVideo.paused) {
+              tryPlayIntro();
             }
-            scheduleFallback();
-          });
+          }, 500);
+        });
       }
     }
 
-    introVideo.addEventListener("ended", closeIntro);
     introVideo.addEventListener("loadedmetadata", tryPlayIntro);
     introVideo.addEventListener("loadeddata", tryPlayIntro);
     introVideo.addEventListener("canplay", tryPlayIntro);
     introVideo.addEventListener("canplaythrough", tryPlayIntro);
+
     introVideo.addEventListener("playing", () => {
-      introFallback.classList.remove("visible");
-      clearTimeout(fallbackTimer);
-    });
-    introVideo.addEventListener("error", scheduleFallback);
-    introVideo.addEventListener("stalled", scheduleFallback);
-
-    introFallback.addEventListener("click", () => {
-      introVideo.muted = true;
-      introVideo
-        .play()
-        .then(() => {
-          introFallback.classList.remove("visible");
-        })
-        .catch(() => {
-          closeIntro();
-        });
+      introFallback?.classList.remove("visible");
+      clearTimeout(introPlayTimer);
     });
 
-    // Dispara assim que o script roda (não espera a página inteira
-    // carregar — em conexões móveis mais lentas isso atrasava demais
-    // a primeira tentativa de autoplay).
-    tryPlayIntro();
-    scheduleFallback();
+    introVideo.addEventListener("ended", closeIntro);
 
-    // Tenta de novo se a aba estava em segundo plano/minimizada e voltou.
+    introVideo.addEventListener("error", () => {
+      const desktopSource = introVideo.dataset.desktopSource || "assets/intro.mp4";
+
+      // Tenta uma única vez voltar ao desktop se a versão
+      // mobile/tablet não estiver presente ou estiver indisponível.
+      if (!introFallbackAttempted && introSource && introSource.src.indexOf(desktopSource) === -1) {
+        introFallbackAttempted = true;
+        introSource.src = desktopSource;
+        introVideo.load();
+        tryPlayIntro();
+      }
+    });
+
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         tryPlayIntro();
@@ -1019,25 +1019,37 @@
 
     window.addEventListener("pageshow", tryPlayIntro);
 
+    // Em navegadores que liberam a reprodução após a primeira interação,
+    // a tentativa é refeita automaticamente, sem abrir player/botão.
     document.addEventListener(
       "touchstart",
       () => {
-        if (introVideo.paused && !introClosed) {
+        if (!introClosed && introVideo.paused) {
           tryPlayIntro();
         }
       },
       { once: true, passive: true }
     );
 
+    document.addEventListener(
+      "click",
+      () => {
+        if (!introClosed && introVideo.paused) {
+          tryPlayIntro();
+        }
+      },
+      { once: true, passive: true }
+    );
+
+    setIntroSource();
+    tryPlayIntro();
+
     /* =========================================================
-       CARROSSEL — loop infinito suave
-       Estratégia: 3 cópias do conjunto original (antes / meio /
-       depois). Navegamos livremente pelo índice; ao fim de cada
-       transição (transitionend), se saímos do bloco do meio,
-       "teletransportamos" sem animação de volta para o bloco
-       do meio na posição equivalente. Como isso acontece só
-       depois que a transição já terminou (fora da área visível
-       de qualquer diferença perceptível), não há pulo nem trava.
+       CARROSSEL — LOOP INFINITO SOB COMANDO
+       O carrossel permanece parado.
+       As flechas, os indicadores e o swipe avançam/voltam
+       suavemente entre os cards. Os conjuntos clonados garantem
+       o loop infinito sem salto visual ao chegar ao início/fim.
     ========================================================= */
 
     const viewport = document.getElementById("carouselViewport");
@@ -1049,145 +1061,336 @@
     const originalCards = Array.from(track.querySelectorAll(".carousel-card"));
     const cardsPerSet = originalCards.length;
 
-    let currentIndex = cardsPerSet;
-    let isAnimating = false;
-    let currentTransform = 0;
+    let cards = [];
+    let setWidth = 0;
+    let positionX = 0;
+
+    /*
+      Movimento contínuo:
+      - o carrossel fica parado até o usuário comandar;
+      - cada clique altera imediatamente o destino;
+      - se o usuário clicar várias vezes, o destino vai sendo
+        ampliado e o track continua deslizando sem "frear e arrancar";
+      - o destino é alcançado com velocidade controlada e amortecimento,
+        produzindo uma transição fluida entre cards.
+    */
+    let targetX = 0;
+    let motionFrame = null;
+    let motionRunning = false;
+    let lastMotionTime = 0;
+
+    const MOVE_SPEED = 1450;       // px/s para um clique rápido
+    const ARRIVAL_SPEED = 9.5;     // suavidade ao chegar no alvo
+    const MAX_TARGET_DISTANCE = 40;
+
+    let lastActiveIndex = -1;
 
     function buildInfiniteTrack() {
       track.innerHTML = "";
 
       const sets = [
-        originalCards.map(c => c.cloneNode(true)),
-        originalCards.map(c => c.cloneNode(true)),
-        originalCards.map(c => c.cloneNode(true))
+        originalCards.map(card => card.cloneNode(true)),
+        originalCards.map(card => card.cloneNode(true)),
+        originalCards.map(card => card.cloneNode(true))
       ];
 
-      sets.forEach(set => set.forEach(card => track.appendChild(card)));
+      sets.forEach(set => {
+        set.forEach(card => track.appendChild(card));
+      });
+
+      cards = Array.from(track.querySelectorAll(".carousel-card"));
     }
 
-    function getCards() {
-      return Array.from(track.querySelectorAll(".carousel-card"));
-    }
-
-    function getGap() {
-      const cards = getCards();
+    function getCardStep() {
       if (cards.length < 2) return 0;
-      const a = cards[0].getBoundingClientRect();
-      const b = cards[1].getBoundingClientRect();
-      return Math.max(0, b.left - a.right);
+
+      return cards[1].offsetLeft - cards[0].offsetLeft;
+    }
+
+    function getSetWidth() {
+      if (!cards.length || cardsPerSet <= 0) return 0;
+
+      return cards[cardsPerSet * 2].offsetLeft -
+        cards[cardsPerSet].offsetLeft;
+    }
+
+    function getCenterPositionForCard(card) {
+      if (!card) return positionX;
+
+      const viewportWidth = viewport.clientWidth;
+      const cardWidth = card.getBoundingClientRect().width;
+
+      return (
+        viewportWidth / 2 -
+        cardWidth / 2 -
+        card.offsetLeft
+      );
+    }
+
+    function getClosestCardIndex() {
+      if (!cards.length) return cardsPerSet;
+
+      const center = viewport.clientWidth / 2;
+      let closestIndex = cardsPerSet;
+      let closestDistance = Infinity;
+
+      cards.forEach((card, index) => {
+        const width = card.getBoundingClientRect().width;
+        const cardCenter =
+          card.offsetLeft +
+          positionX +
+          width / 2;
+
+        const distance = Math.abs(cardCenter - center);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      return closestIndex;
+    }
+
+    function normalizePosition() {
+      if (!setWidth) return;
+
+      /*
+        A troca acontece somente por um conjunto inteiro.
+        Os três conjuntos são idênticos, então a posição visual
+        permanece exatamente equivalente.
+      */
+      while (positionX < -setWidth * 1.5) {
+        positionX += setWidth;
+        targetX += setWidth;
+      }
+
+      while (positionX > -setWidth * 0.5) {
+        positionX -= setWidth;
+        targetX -= setWidth;
+      }
     }
 
     function updateActiveCard() {
-      const cards = getCards();
+      if (!cards.length) return;
+
+      const closestIndex = getClosestCardIndex();
+
       cards.forEach((card, index) => {
-        card.classList.toggle("active", index === currentIndex);
+        card.classList.toggle("active", index === closestIndex);
       });
+
+      if (closestIndex !== lastActiveIndex) {
+        lastActiveIndex = closestIndex;
+
+        const realIndex =
+          ((closestIndex % cardsPerSet) + cardsPerSet) % cardsPerSet;
+
+        Array.from(dotsContainer.children).forEach((dot, index) => {
+          dot.classList.toggle("active", index === realIndex);
+        });
+      }
     }
 
-    function updateDots() {
-      const realIndex = ((currentIndex - cardsPerSet) % cardsPerSet + cardsPerSet) % cardsPerSet;
-      Array.from(dotsContainer.children).forEach((dot, index) => {
-        dot.classList.toggle("active", index === realIndex);
-      });
-    }
+    function render() {
+      normalizePosition();
 
-    function applyTransform(animate) {
-      const cards = getCards();
-      const activeCard = cards[currentIndex];
-      if (!activeCard) return;
-
-      const cardWidth = activeCard.getBoundingClientRect().width;
-      const gap = getGap();
-      const viewportWidth = viewport.getBoundingClientRect().width;
-      const wrapperOffset = viewportWidth / 2 - cardWidth / 2;
-      const distance = currentIndex * (cardWidth + gap);
-      const transform = Math.round(wrapperOffset - distance);
-
-      currentTransform = transform;
-
-      track.style.transition = animate ? "transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1)" : "none";
-      track.style.transform = "translate3d(" + transform + "px, 0, 0)";
+      track.style.transition = "none";
+      track.style.transform =
+        "translate3d(" +
+        positionX.toFixed(3) +
+        "px, 0, 0)";
 
       updateActiveCard();
-      updateDots();
     }
 
-    function handleTransitionEnd(event) {
-      if (event.target !== track || event.propertyName !== "transform") return;
+    function startMotionLoop() {
+      if (motionRunning) return;
 
-      // Se saiu do bloco do meio, reposiciona sem animação (invisível ao usuário,
-      // pois o card já está centralizado e a troca é instantânea).
-      if (currentIndex >= cardsPerSet * 2) {
-        currentIndex -= cardsPerSet;
-        applyTransform(false);
-      } else if (currentIndex < cardsPerSet) {
-        currentIndex += cardsPerSet;
-        applyTransform(false);
+      motionRunning = true;
+      lastMotionTime = performance.now();
+      motionFrame = requestAnimationFrame(motionStep);
+    }
+
+    function stopMotionLoop() {
+      motionRunning = false;
+
+      if (motionFrame) {
+        cancelAnimationFrame(motionFrame);
+        motionFrame = null;
+      }
+    }
+
+    function motionStep(now) {
+      if (!motionRunning) return;
+
+      const deltaTime = Math.min(
+        0.033,
+        Math.max(0.001, (now - lastMotionTime) / 1000)
+      );
+
+      lastMotionTime = now;
+
+      const distance = targetX - positionX;
+
+      /*
+        Velocidade constante na maior parte do percurso.
+        Perto do alvo, desacelera suavemente.
+        Assim um clique não dá a sensação de "travar" no meio.
+      */
+      const distanceAbs = Math.abs(distance);
+
+      if (distanceAbs > 0.8) {
+        const direction = Math.sign(distance);
+
+        const arrivalFactor = Math.min(
+          1,
+          distanceAbs / MAX_TARGET_DISTANCE
+        );
+
+        const speed =
+          MOVE_SPEED *
+          (0.72 + 0.28 * arrivalFactor);
+
+        const maxStep = speed * deltaTime;
+
+        positionX +=
+          direction *
+          Math.min(distanceAbs, maxStep);
+
+        // Nos últimos pixels, um amortecimento suave evita estalo.
+        const remaining =
+          targetX - positionX;
+
+        if (Math.abs(remaining) < 0.8) {
+          positionX = targetX;
+        }
+      } else {
+        positionX = targetX;
       }
 
-      isAnimating = false;
+      render();
+
+      if (Math.abs(targetX - positionX) > 0.8) {
+        motionFrame = requestAnimationFrame(motionStep);
+        return;
+      }
+
+      positionX = targetX;
+      render();
+
+      stopMotionLoop();
     }
 
-    track.addEventListener("transitionend", handleTransitionEnd);
+    function moveByCards(numberOfCards) {
+      if (!cards.length) return;
 
-    function moveTo(index) {
-      if (isAnimating) return;
-      isAnimating = true;
-      currentIndex = index;
-      applyTransform(true);
+      const step = getCardStep();
+      if (!step) return;
+
+      /*
+        Em vez de iniciar uma nova animação do zero, apenas mudamos
+        o destino. Isso é o que elimina a sensação de "trava".
+      */
+      targetX += -numberOfCards * step;
+
+      normalizeTarget();
+
+      startMotionLoop();
+    }
+
+    function normalizeTarget() {
+      if (!setWidth) return;
+
+      while (targetX < -setWidth * 1.5) {
+        targetX += setWidth;
+        positionX += setWidth;
+      }
+
+      while (targetX > -setWidth * 0.5) {
+        targetX -= setWidth;
+        positionX -= setWidth;
+      }
     }
 
     function nextCard() {
-      moveTo(currentIndex + 1);
+      moveByCards(1);
     }
 
     function previousCard() {
-      moveTo(currentIndex - 1);
+      moveByCards(-1);
     }
 
     prevButton.addEventListener("click", previousCard);
     nextButton.addEventListener("click", nextCard);
 
-    /* Setas: opacidade sobe ao toque em telas touch, some depois */
     [prevButton, nextButton].forEach(btn => {
       btn.addEventListener(
         "touchstart",
         () => btn.classList.add("touched"),
         { passive: true }
       );
+
       btn.addEventListener(
         "touchend",
-        () => setTimeout(() => btn.classList.remove("touched"), 900),
+        () => {
+          setTimeout(
+            () => btn.classList.remove("touched"),
+            900
+          );
+        },
         { passive: true }
       );
     });
 
-    /* =========================================================
-       DOTS
-    ========================================================= */
-
     function createDots() {
       dotsContainer.innerHTML = "";
+
       for (let i = 0; i < cardsPerSet; i++) {
         const dot = document.createElement("button");
+
         dot.type = "button";
         dot.className = "carousel-dot";
-        dot.setAttribute("aria-label", "Ir para produto " + (i + 1));
-        dot.addEventListener("click", () => moveTo(cardsPerSet + i));
+        dot.setAttribute(
+          "aria-label",
+          "Ir para produto " + (i + 1)
+        );
+
+        dot.addEventListener("click", () => {
+          if (!cards.length) return;
+
+          const currentIndex = getClosestCardIndex();
+
+          const currentReal =
+            ((currentIndex % cardsPerSet) + cardsPerSet) % cardsPerSet;
+
+          let forward = i - currentReal;
+
+          if (forward > cardsPerSet / 2) {
+            forward -= cardsPerSet;
+          } else if (forward < -cardsPerSet / 2) {
+            forward += cardsPerSet;
+          }
+
+          if (!forward) return;
+
+          moveByCards(forward);
+        });
+
         dotsContainer.appendChild(dot);
       }
     }
 
-    /* =========================================================
-       SWIPE
-    ========================================================= */
-
     let touchStartX = 0;
+    let touchStartY = 0;
 
     viewport.addEventListener(
       "touchstart",
       event => {
-        touchStartX = event.changedTouches[0].screenX;
+        const touch = event.changedTouches[0];
+
+        touchStartX = touch.screenX;
+        touchStartY = touch.screenY;
       },
       { passive: true }
     );
@@ -1195,47 +1398,106 @@
     viewport.addEventListener(
       "touchend",
       event => {
-        const touchEndX = event.changedTouches[0].screenX;
-        const distance = touchEndX - touchStartX;
-        if (Math.abs(distance) < 45) return;
-        if (distance < 0) nextCard();
-        else previousCard();
+        const touch = event.changedTouches[0];
+
+        const dx = touch.screenX - touchStartX;
+        const dy = touch.screenY - touchStartY;
+
+        if (
+          Math.abs(dx) < 45 ||
+          Math.abs(dx) < Math.abs(dy)
+        ) {
+          return;
+        }
+
+        if (dx < 0) {
+          nextCard();
+        } else {
+          previousCard();
+        }
       },
       { passive: true }
     );
 
-    /* =========================================================
-       RESIZE
-    ========================================================= */
-
     let resizeTimer;
 
-    window.addEventListener("resize", () => {
+    function handleResize() {
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => applyTransform(false), 120);
-    });
+
+      resizeTimer = setTimeout(() => {
+        const currentIndex = getClosestCardIndex();
+        const currentCard = cards[currentIndex];
+
+        stopMotionLoop();
+
+        setWidth = getSetWidth();
+
+        if (currentCard) {
+          positionX =
+            getCenterPositionForCard(currentCard);
+
+          targetX = positionX;
+        }
+
+        normalizePosition();
+        normalizeTarget();
+        render();
+      }, 120);
+    }
+
+    window.addEventListener("resize", handleResize);
 
     window.addEventListener("orientationchange", () => {
-      setTimeout(() => applyTransform(false), 250);
+      setTimeout(() => {
+        setIntroSource();
+        tryPlayIntro();
+
+        stopMotionLoop();
+
+        measureCarousel();
+        scrollSiteToTop();
+      }, 300);
     });
 
-    /* =========================================================
-       INICIALIZAÇÃO
-    ========================================================= */
+    function measureCarousel() {
+      if (!cards.length) return;
+
+      setWidth = getSetWidth();
+
+      const currentIndex = getClosestCardIndex();
+      const middleFirstCard = cards[cardsPerSet];
+      const targetCard = cards[currentIndex] || middleFirstCard;
+
+      positionX =
+        getCenterPositionForCard(targetCard);
+
+      targetX = positionX;
+
+      normalizePosition();
+      normalizeTarget();
+      render();
+    }
 
     buildInfiniteTrack();
     createDots();
-    applyTransform(false);
 
-    // Pequenos ajustes de segurança após fontes/imagens/layout assentarem
-    setTimeout(() => applyTransform(false), 150);
-    setTimeout(() => applyTransform(false), 500);
+    requestAnimationFrame(() => {
+      measureCarousel();
+      scrollSiteToTop();
+    });
 
-    window.addEventListener("load", () => applyTransform(false));
+    window.addEventListener("load", () => {
+      measureCarousel();
+      tryPlayIntro();
+      scrollSiteToTop();
+    });
 
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => applyTransform(false));
+      document.fonts.ready.then(() => {
+        measureCarousel();
+      });
     }
+
   </script>
 
 </body>
