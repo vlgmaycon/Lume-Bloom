@@ -1,1504 +1,1623 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#3B3026">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <title>LUMÈ BLOOM — Essência que Floresce</title>
-
-  <style>
-    :root {
-      --champagne: #E6E3DB;
-      --ivory: #FCFAF6;
-      --ink: #3B3026;
-      --taupe: #756A5D;
-      --gold: #C7A46A;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    html {
-      width: 100%;
-      min-height: 100%;
-      overflow-x: hidden;
-      background: var(--ivory);
-    }
-
-    body {
-      width: 100%;
-      min-height: 100vh;
-      min-height: 100dvh;
-      overflow-x: hidden;
-      background: var(--ivory);
-      color: var(--ink);
-      font-family: Georgia, "Times New Roman", serif;
-      position: relative;
-    }
-
-    button,
-    a {
-      font: inherit;
-    }
-
-    /* =========================================================
-       INTRO
-    ========================================================= */
-
-    .intro-screen {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      height: 100dvh;
-      background: #050505;
-      z-index: 99999;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .intro-video {
-      position: absolute;
-      inset: 0;
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center center;
-      background: #050505;
-      border: 0;
-      outline: 0;
-    }
-
-    .intro-fallback {
-      position: absolute;
-      left: 50%;
-      bottom: 8%;
-      transform: translateX(-50%);
-      z-index: 2;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 14px 28px;
-      min-width: 190px;
-      border: 1px solid rgba(230, 227, 219, 0.65);
-      border-radius: 999px;
-      background: rgba(5, 5, 5, 0.55);
-      color: var(--champagne);
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      font-size: 11px;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .intro-fallback.visible {
-      display: none !important;
-    }
-
-    .intro-screen.hidden {
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition:
-        opacity 0.8s ease,
-        visibility 0.8s ease;
-    }
-/* =========================================================
-       SITE
-    ========================================================= */
-
-    .main-site {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      min-height: 100vh;
-      min-height: 100dvh;
-      background:
-        radial-gradient(
-          circle at top,
-          rgba(199, 164, 106, 0.08),
-          transparent 32%
-        );
-    }
-
-    /* =========================================================
-       NAVBAR
-    ========================================================= */
-
-    .navbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      width: 100%;
-      padding: 18px 24px;
-      background: rgba(252, 250, 246, 0.92);
-      border-bottom: 1px solid rgba(59, 48, 38, 0.08);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-
-    .navbar-brand {
-      flex: 0 0 auto;
-      display: flex;
-      align-items: center;
-    }
-
-    .navbar-brand img {
-      display: block;
-      height: clamp(15px, 2.2vw, 21px);
-      width: auto;
-    }
-
-    .navbar-links {
-      display: flex;
-      align-items: center;
-      gap: clamp(14px, 3vw, 30px);
-      list-style: none;
-    }
-
-    .navbar-link {
-      background: none;
-      border: none;
-      padding: 4px 0;
-      color: var(--taupe);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      cursor: pointer;
-      position: relative;
-    }
-
-    .navbar-link::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 100%;
-      bottom: -4px;
-      height: 1px;
-      background: var(--gold);
-      transition: right 0.3s ease;
-    }
-
-    .navbar-link:hover {
-      color: var(--ink);
-    }
-
-    .navbar-link:hover::after {
-      right: 0;
-    }
-
-    @media (max-width: 560px) {
-      .navbar {
-        padding: 14px 16px;
-      }
-
-      .navbar-links {
-        gap: 12px;
-      }
-
-      .navbar-link {
-        font-size: 9.5px;
-        letter-spacing: 0.08em;
-      }
-    }
-
-    @media (max-width: 400px) {
-      .navbar-brand img {
-        height: 13px;
-      }
-
-      .navbar-links {
-        gap: 9px;
-      }
-
-      .navbar-link {
-        font-size: 8.5px;
-      }
-    }
-
-    /* =========================================================
-       HERO
-    ========================================================= */
-
-    .hero {
-      width: 100%;
-      padding: 58px 20px 20px;
-      text-align: center;
-    }
-
-    .hero-eyebrow {
-      margin-bottom: 12px;
-      color: var(--gold);
-      font-size: 10px;
-      letter-spacing: 0.32em;
-      text-transform: uppercase;
-    }
-
-    .hero-title {
-      color: var(--ink);
-      font-size: clamp(30px, 6vw, 56px);
-      font-weight: 400;
-      line-height: 1.12;
-    }
-
-    .hero-description {
-      max-width: 600px;
-      margin: 18px auto 0;
-      color: var(--taupe);
-      font-size: 14px;
-      line-height: 1.8;
-    }
-
-    /* =========================================================
-       CARROSSEL
-    ========================================================= */
-
-    .carousel-section {
-      width: 100%;
-      padding: 20px 0 80px;
-      overflow: hidden;
-    }
-
-    .carousel-wrapper {
-      position: relative;
-      width: 100%;
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 22px;
-      overflow: visible;
-    }
-
-    .carousel-viewport {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      padding: 72px 24px 80px;
-    }
-
-    .carousel-track {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      width: max-content;
-      will-change: transform;
-    }
-
-    .carousel-card {
-      position: relative;
-      flex: 0 0 280px;
-      width: 280px;
-      transform: scale(0.84);
-      transform-origin: center center;
-      opacity: 0.48;
-      filter: blur(2.5px);
-      transition:
-        transform 0.55s ease,
-        opacity 0.55s ease,
-        filter 0.55s ease;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    .carousel-card.active {
-      transform: scale(1.02);
-      opacity: 1;
-      filter: blur(0);
-      z-index: 3;
-    }
-
-    .card-image {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      overflow: hidden;
-      border-radius: 24px;
-      background:
-        linear-gradient(
-          145deg,
-          rgba(230, 227, 219, 0.95),
-          rgba(117, 106, 93, 0.18)
-        );
-      border: 1px solid rgba(59, 48, 38, 0.12);
-      box-shadow:
-        0 22px 55px rgba(59, 48, 38, 0.14),
-        0 4px 12px rgba(59, 48, 38, 0.08);
-    }
-
-    .card-image::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(
-          to bottom,
-          transparent 50%,
-          rgba(59, 48, 38, 0.14)
-        );
-    }
-
-    .card-image img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center;
-    }
-
-    .card-placeholder {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      text-align: center;
-      color: var(--taupe);
-      font-size: 13px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .card-info {
-      padding: 20px 5px 0;
-      text-align: center;
-    }
-
-    .card-title {
-      color: var(--ink);
-      font-size: 19px;
-      font-weight: 400;
-      letter-spacing: 0.04em;
-    }
-
-    .card-description {
-      margin-top: 7px;
-      color: var(--taupe);
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
-    /* =========================================================
-       SETAS
-       Transparentes por padrão, ganham opacidade ao toque/hover,
-       e ficam mais próximas do centro (não coladas na borda).
-    ========================================================= */
-
-    .nav-arrow {
-      position: absolute;
-      top: 50%;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 46px;
-      height: 46px;
-      margin-top: -23px;
-      border: 1px solid rgba(59, 48, 38, 0.16);
-      border-radius: 50%;
-      background: rgba(252, 250, 246, 0.85);
-      color: var(--ink);
-      cursor: pointer;
-      opacity: 0.38;
-      box-shadow: 0 8px 24px rgba(59, 48, 38, 0.10);
-      transition:
-        opacity 0.35s ease,
-        background 0.25s ease,
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
-    .nav-arrow:hover,
-    .nav-arrow:focus-visible,
-    .nav-arrow.touched {
-      opacity: 1;
-      background: #ffffff;
-      box-shadow: 0 12px 30px rgba(59, 48, 38, 0.16);
-    }
-
-    .nav-arrow:active {
-      transform: scale(0.94);
-    }
-
-    .nav-arrow.left {
-      left: 14%;
-    }
-
-    .nav-arrow.right {
-      right: 14%;
-    }
-
-    .nav-arrow span {
-      display: block;
-      font-size: 25px;
-      line-height: 1;
-      margin-top: -2px;
-    }
-
-    /* =========================================================
-       INDICADORES
-    ========================================================= */
-
-    .carousel-dots {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin-top: -25px;
-      position: relative;
-      z-index: 10;
-    }
-
-    .carousel-dot {
-      width: 6px;
-      height: 6px;
-      padding: 0;
-      border: 0;
-      border-radius: 50%;
-      background: rgba(59, 48, 38, 0.22);
-      cursor: pointer;
-      transition:
-        width 0.3s ease,
-        background 0.3s ease;
-    }
-
-    .carousel-dot.active {
-      width: 24px;
-      border-radius: 999px;
-      background: var(--gold);
-    }
-
-    /* =========================================================
-       MOBILE
-    ========================================================= */
-
-    @media (max-width: 768px) {
-      .hero {
-        padding: 42px 18px 10px;
-      }
-
-      .hero-description {
-        font-size: 13px;
-        line-height: 1.7;
-      }
-
-      .carousel-section {
-        padding-bottom: 60px;
-      }
-
-      .carousel-wrapper {
-        padding: 0 8px;
-      }
-
-      .carousel-viewport {
-        padding: 62px 18px 72px;
-      }
-
-      .carousel-track {
-        gap: 18px;
-      }
-
-      .carousel-card {
-        flex-basis: min(240px, calc(100vw - 132px));
-        width: min(240px, calc(100vw - 132px));
-        transform: scale(0.86);
-      }
-
-      .carousel-card.active {
-        transform: scale(1.01);
-      }
-
-      .nav-arrow {
-        width: 42px;
-        height: 42px;
-        margin-top: -21px;
-      }
-
-      .nav-arrow.left {
-        left: 6%;
-      }
-
-      .nav-arrow.right {
-        right: 6%;
-      }
-
-      .card-image {
-        border-radius: 21px;
-      }
-
-      .card-title {
-        font-size: 17px;
-      }
-
-      .card-description {
-        font-size: 10px;
-      }
-    }
-
-    /* =========================================================
-       CELULARES PEQUENOS
-    ========================================================= */
-
-    @media (max-width: 430px) {
-      .hero {
-        padding-top: 34px;
-      }
-
-      .hero-title {
-        font-size: 29px;
-      }
-
-      .carousel-wrapper {
-        padding: 0 4px;
-      }
-
-      .carousel-viewport {
-        padding: 55px 14px 68px;
-      }
-
-      .carousel-track {
-        gap: 15px;
-      }
-
-      .carousel-card {
-        flex-basis: min(210px, calc(100vw - 112px));
-        width: min(210px, calc(100vw - 112px));
-        transform: scale(0.88);
-      }
-
-      .carousel-card.active {
-        transform: scale(1);
-      }
-
-      .nav-arrow {
-        width: 40px;
-        height: 40px;
-        margin-top: -20px;
-      }
-
-      .nav-arrow.left {
-        left: 2%;
-      }
-
-      .nav-arrow.right {
-        right: 2%;
-      }
-
-      .nav-arrow span {
-        font-size: 22px;
-      }
-    }
-
-    /* =========================================================
-       CELULARES MUITO PEQUENOS
-    ========================================================= */
-
-    @media (max-width: 360px) {
-      .carousel-viewport {
-        padding-left: 10px;
-        padding-right: 10px;
-      }
-
-      .carousel-card {
-        flex-basis: calc(100vw - 104px);
-        width: calc(100vw - 104px);
-      }
-
-      .nav-arrow {
-        width: 38px;
-        height: 38px;
-      }
-    }
-
-    /* =========================================================
-       TABLET
-    ========================================================= */
-
-    @media (min-width: 769px) and (max-width: 1100px) {
-      .carousel-wrapper {
-        padding: 0 16px;
-      }
-
-      .carousel-viewport {
-        padding-left: 22px;
-        padding-right: 22px;
-      }
-
-      .carousel-card {
-        flex-basis: 250px;
-        width: 250px;
-        transform: scale(0.86);
-      }
-
-      .carousel-card.active {
-        transform: scale(1.01);
-      }
-    }
-
-    /* =========================================================
-       REDUÇÃO DE MOVIMENTO
-    ========================================================= */
-
-    @media (prefers-reduced-motion: reduce) {
-      .carousel-card,
-      .intro-screen,
-      .intro-fallback,
-      .nav-arrow,
-      .carousel-dot {
-        transition: none !important;
-      }
-    }
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FBF7EC">
+<meta name="description" content="LUMÈ BLOOM — beleza, autocuidado e aromatização para sua casa.">
+<title>LUMÈ BLOOM — Essência que Floresce</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ivory:#FBF7EC;
+  --brown:#483C23;
+  --sage:#A6AE8A;
+  --sage-dark:#87916D;
+  --sand:#D8C8AE;
+  --champagne:#C5A46D;
+  --pearl:#E9E2D5;
+  --ink:#483C23;
+  --taupe:#827763;
+  --gold:#C5A46D;
+  --gold-light:#E6D3AD;
+  --header:#FBF7EC;
+
+  --font-title:'Cormorant Garamond',Georgia,serif;
+  --font-body:'Montserrat',sans-serif;
+}
+
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html {
+  scroll-behavior:smooth;
+  scroll-padding-top:100px;
+}
+
+body {
+  background:var(--ivory);
+  color:var(--ink);
+  font-family:var(--font-body);
+  overflow-x:hidden;
+}
+
+a {
+  text-decoration:none;
+  color:inherit;
+}
+
+button {
+  font:inherit;
+}
+
+.container {
+  width:min(1180px,90%);
+  margin:auto;
+}
+
+.eyebrow {
+  color:var(--sage-dark);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:4px;
+  text-transform:uppercase;
+}
+
+.section-heading {
+  text-align:center;
+  margin-bottom:48px;
+}
+
+.section-heading h2 {
+  font-family:var(--font-title);
+  font-size:clamp(40px,5vw,62px);
+  font-weight:400;
+  margin-top:12px;
+  color:var(--brown);
+}
+
+.section-heading p {
+  max-width:570px;
+  margin:12px auto 0;
+  color:var(--taupe);
+  font-size:11px;
+  line-height:2;
+}
+
+.primary-button,
+.outline-button {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:48px;
+  padding:0 28px;
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  transition:.3s;
+  cursor:pointer;
+}
+
+.primary-button {
+  background:var(--sage);
+  border:1px solid var(--sage);
+  color:white;
+}
+
+.primary-button:hover {
+  background:var(--brown);
+  border-color:var(--brown);
+}
+
+.outline-button {
+  border:1px solid var(--sage-dark);
+  color:var(--brown);
+}
+
+.outline-button:hover {
+  background:var(--sage);
+  border-color:var(--sage);
+  color:white;
+}
+
+/* INTRO */
+
+.intro {
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#483C23;
+  transition:opacity 1s,visibility 1s;
+}
+
+.intro.hidden {
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.intro video {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.intro-overlay {
+  position:absolute;
+  inset:0;
+  background:rgba(72,60,35,.16);
+  pointer-events:none;
+}
+
+.skip-intro {
+  position:absolute;
+  right:25px;
+  bottom:25px;
+  padding:12px 18px;
+  color:white;
+  background:rgba(251,247,236,.12);
+  border:1px solid rgba(251,247,236,.4);
+  cursor:pointer;
+  font-size:10px;
+  letter-spacing:2px;
+  backdrop-filter:blur(10px);
+}
+
+/* HEADER */
+
+.header {
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:#FBF7EC;
+  backdrop-filter:blur(18px);
+  border:0;
+  border-bottom:none;
+  box-shadow:none;
+}
+
+.navbar {
+  min-height:88px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+}
+
+.brand {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.brand-logo {
+  display:block;
+  width:190px;
+  max-height:68px;
+  height:auto;
+  object-fit:contain;
+}
+
+.nav-links {
+  display:flex;
+  align-items:center;
+  gap:23px;
+}
+
+.nav-links a {
+  color:var(--brown);
+  font-size:11px;
+  font-weight:500;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  white-space:nowrap;
+  transition:color .3s;
+}
+
+.nav-links a:hover {
+  color:var(--sage-dark);
+}
+
+.menu-toggle {
+  display:none;
+  border:0;
+  background:none;
+  color:var(--brown);
+  font-size:26px;
+  cursor:pointer;
+}
+
+/* HERO */
+
+.hero {
+  position:relative;
+  min-height:650px;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  isolation:isolate;
+  background:
+    linear-gradient(90deg,rgba(48,39,24,.72),rgba(48,39,24,.12)),
+    url('assets/fundo-morada-app.png') center/cover;
+  background-color:var(--sand);
+}
+
+.hero::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:190px;
+  z-index:0;
+  pointer-events:none;
+  background:linear-gradient(
+    to bottom,
+    #FBF7EC 0%,
+    rgba(251,247,236,.88) 15%,
+    rgba(251,247,236,.55) 42%,
+    rgba(251,247,236,.16) 75%,
+    transparent 100%
+  );
+}
+
+.hero-content {
+  position:relative;
+  z-index:1;
+  width:min(650px,90%);
+  margin-left:max(5%,calc((100% - 1180px)/2));
+  padding:90px 0;
+  color:white;
+}
+
+.hero .eyebrow {
+  color:var(--gold-light);
+}
+
+.hero h1 {
+  font-family:var(--font-title);
+  font-size:clamp(65px,9vw,110px);
+  font-weight:400;
+  line-height:.9;
+  margin:22px 0;
+}
+
+.hero p {
+  max-width:460px;
+  color:rgba(255,255,255,.9);
+  font-size:12px;
+  line-height:2.1;
+  margin-bottom:30px;
+}
+
+.hero .primary-button {
+  background:var(--sage);
+  border-color:var(--sage);
+  color:white;
+}
+
+.hero .primary-button:hover {
+  background:var(--champagne);
+  border-color:var(--champagne);
+}
+
+/* APRESENTAÇÃO */
+
+.brand-intro {
+  padding:100px 0;
+  text-align:center;
+  background:var(--ivory);
+}
+
+.brand-intro h2 {
+  font-family:var(--font-title);
+  font-size:clamp(40px,5vw,62px);
+  font-weight:400;
+  margin:15px 0;
+  color:var(--brown);
+}
+
+.brand-intro p {
+  max-width:650px;
+  margin:auto;
+  color:var(--taupe);
+  font-size:12px;
+  line-height:2.2;
+}
+
+/* COLEÇÕES */
+
+.collections {
+  padding:90px 0 105px;
+  background:var(--pearl);
+}
+
+.collection-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:25px;
+}
+
+.collection-card {
+  min-height:420px;
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  overflow:hidden;
+  isolation:isolate;
+  background-color:var(--sand);
+}
+
+.collection-card::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:linear-gradient(0deg,rgba(48,39,24,.8),transparent 75%);
+  transition:.4s;
+}
+
+.collection-card:hover::before {
+  background:linear-gradient(0deg,rgba(72,60,35,.9),rgba(72,60,35,.05));
+}
+
+.collection-card.beauty {
+  background-image:url('https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1200&q=85');
+  background-position:center;
+  background-size:cover;
+}
+
+.collection-card.home {
+  background-image:url('https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?auto=format&fit=crop&w=1200&q=85');
+  background-position:center;
+  background-size:cover;
+}
+
+.collection-content {
+  padding:42px;
+  color:white;
+}
+
+.collection-content .eyebrow {
+  color:var(--gold-light);
+}
+
+.collection-content h3 {
+  font-family:var(--font-title);
+  font-size:48px;
+  font-weight:400;
+  margin:10px 0;
+}
+
+.collection-content p {
+  max-width:350px;
+  margin-bottom:22px;
+  color:rgba(255,255,255,.9);
+  font-size:11px;
+  line-height:1.9;
+}
+
+.collection-content a {
+  display:inline-block;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--gold-light);
+  color:white;
+  font-size:10px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+/* SEÇÕES DE PRODUTOS */
+
+.products-section {
+  padding:100px 0 110px;
+  overflow:hidden;
+  background:var(--ivory);
+}
+
+.products-section.alternate {
+  background:var(--pearl);
+}
+
+/* CARROSSEL */
+
+.carousel-wrapper {
+  position:relative;
+  width:100%;
+  padding:20px 0 45px;
+  overflow:hidden;
+}
+
+.carousel-track {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:22px;
+  width:100%;
+  min-height:420px;
+}
+
+.product-card {
+  flex:0 0 28%;
+  max-width:340px;
+  min-width:0;
+  background:rgba(251,247,236,.94);
+  border:1px solid rgba(197,164,109,.28);
+  box-shadow:0 10px 30px rgba(72,60,35,.07);
+  opacity:.58;
+  transform:scale(.82);
+  filter:saturate(.85);
+  transition:
+    transform .55s ease,
+    opacity .55s ease,
+    box-shadow .55s ease,
+    filter .55s ease;
+  overflow:hidden;
+  position:relative;
+}
+
+.product-card.active {
+  opacity:1;
+  transform:scale(1.08);
+  z-index:3;
+  filter:saturate(1);
+  box-shadow:0 22px 55px rgba(72,60,35,.16);
+  border-color:rgba(197,164,109,.7);
+}
+
+.product-card.side {
+  z-index:1;
+}
+
+.product-image {
+  height:260px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  background:linear-gradient(145deg,var(--sand),var(--ivory));
+}
+
+.product-image img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:transform .6s;
+}
+
+.product-card.active:hover .product-image img {
+  transform:scale(1.05);
+}
+
+.image-placeholder {
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  text-align:center;
+  color:var(--brown);
+  font-family:var(--font-title);
+  font-size:28px;
+  background:
+    radial-gradient(circle at 50% 40%,rgba(251,247,236,.95),transparent 70%),
+    linear-gradient(145deg,var(--sand),var(--ivory));
+}
+
+.product-info {
+  padding:23px 15px 25px;
+  text-align:center;
+}
+
+.product-info small {
+  display:block;
+  color:var(--sage-dark);
+  font-size:8px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.product-info h3 {
+  font-family:var(--font-title);
+  font-size:27px;
+  font-weight:500;
+  line-height:1.1;
+  margin-bottom:10px;
+  color:var(--brown);
+}
+
+.product-info p {
+  color:var(--taupe);
+  font-size:10px;
+  line-height:1.8;
+  min-height:36px;
+  margin-bottom:16px;
+}
+
+.product-info a {
+  display:inline-block;
+  color:var(--brown);
+  border-bottom:1px solid var(--champagne);
+  padding-bottom:5px;
+  font-size:9px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+.product-info a:hover {
+  color:var(--sage-dark);
+}
+
+.carousel-arrow {
+  position:absolute;
+  top:50%;
+  z-index:5;
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform:translateY(-50%);
+  border:1px solid rgba(166,174,138,.8);
+  border-radius:50%;
+  background:rgba(251,247,236,.95);
+  color:var(--brown);
+  font-size:22px;
+  cursor:pointer;
+  transition:.3s;
+  box-shadow:0 5px 20px rgba(72,60,35,.08);
+}
+
+.carousel-arrow:hover {
+  background:var(--sage);
+  border-color:var(--sage);
+  color:white;
+}
+
+.carousel-arrow.prev {
+  left:1%;
+}
+
+.carousel-arrow.next {
+  right:1%;
+}
+
+.carousel-dots {
+  display:flex;
+  justify-content:center;
+  gap:9px;
+  margin-top:8px;
+}
+
+.carousel-dot {
+  width:7px;
+  height:7px;
+  border:0;
+  border-radius:50%;
+  background:var(--sand);
+  cursor:pointer;
+  transition:.3s;
+}
+
+.carousel-dot.active {
+  width:23px;
+  border-radius:10px;
+  background:var(--sage-dark);
+}
+
+/* KITS */
+
+.kits-section {
+  background:var(--brown);
+  color:white;
+}
+
+.kits-section .section-heading h2 {
+  color:var(--ivory);
+}
+
+.kits-section .section-heading p {
+  color:rgba(251,247,236,.75);
+}
+
+.kits-section .section-heading .eyebrow {
+  color:var(--gold-light);
+}
+
+.kits-section .product-card {
+  background:var(--ivory);
+}
+
+.kits-section .carousel-arrow {
+  background:rgba(251,247,236,.96);
+}
+
+/* EXPERIÊNCIA */
+
+.experience {
+  padding:100px 0;
+  background:var(--ivory);
+}
+
+.experience-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:35px;
+  text-align:center;
+}
+
+.experience-item {
+  padding:20px;
+}
+
+.experience-icon {
+  color:var(--sage-dark);
+  font-family:var(--font-title);
+  font-size:40px;
+  margin-bottom:15px;
+}
+
+.experience-item h3 {
+  font-family:var(--font-title);
+  font-size:28px;
+  font-weight:500;
+  margin-bottom:10px;
+  color:var(--brown);
+}
+
+.experience-item p {
+  color:var(--taupe);
+  font-size:10px;
+  line-height:2;
+}
+
+/* INSTAGRAM */
+
+.instagram {
+  padding:90px 0;
+  background:var(--pearl);
+  text-align:center;
+}
+
+.instagram h2 {
+  font-family:var(--font-title);
+  font-size:52px;
+  font-weight:400;
+  margin:12px 0;
+  color:var(--brown);
+}
+
+.instagram p {
+  color:var(--taupe);
+  font-size:11px;
+  line-height:2;
+  margin-bottom:25px;
+}
+
+/* PEDIDOS */
+
+.orders {
+  padding:90px 0;
+  text-align:center;
+  background:var(--ivory);
+}
+
+.orders h2 {
+  font-family:var(--font-title);
+  font-size:52px;
+  font-weight:400;
+  margin:12px 0;
+  color:var(--brown);
+}
+
+.orders p {
+  color:var(--taupe);
+  font-size:11px;
+  line-height:2;
+  margin-bottom:25px;
+}
+
+.marketplace-buttons {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+/* FOOTER */
+
+.footer {
+  padding:65px 0 25px;
+  background:var(--brown);
+  color:var(--ivory);
+}
+
+.footer-content {
+  display:grid;
+  grid-template-columns:1.5fr 1fr 1fr;
+  gap:50px;
+  padding-bottom:45px;
+}
+
+.footer-brand .brand-name {
+  color:var(--ivory);
+  display:inline-block;
+  margin-bottom:10px;
+  font-family:var(--font-title);
+  font-size:30px;
+  letter-spacing:2px;
+}
+
+.footer-brand p,
+.footer p {
+  color:rgba(251,247,236,.72);
+  font-size:10px;
+  line-height:2;
+  max-width:330px;
+}
+
+.footer h3 {
+  color:var(--gold-light);
+  font-family:var(--font-title);
+  font-size:25px;
+  font-weight:500;
+  margin-bottom:18px;
+}
+
+.footer-links {
+  display:flex;
+  flex-direction:column;
+  gap:13px;
+}
+
+.footer-links a {
+  color:rgba(251,247,236,.8);
+  font-size:10px;
+  transition:.3s;
+}
+
+.footer-links a:hover {
+  color:var(--sage);
+}
+
+.copyright {
+  padding-top:22px;
+  border-top:1px solid rgba(251,247,236,.16);
+  text-align:center;
+  color:rgba(251,247,236,.55);
+  font-size:9px;
+  letter-spacing:1px;
+}
+
+/* ACESSIBILIDADE */
+
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    scroll-behavior:auto!important;
+    transition:none!important;
+  }
+}
+
+/* RESPONSIVO */
+
+@media(max-width:1150px) {
+  .nav-links {
+    gap:15px;
+  }
+
+  .nav-links a {
+    font-size:10px;
+    letter-spacing:.7px;
+  }
+
+  .brand-logo {
+    width:170px;
+  }
+}
+
+@media(max-width:1000px) {
+  .nav-links {
+    gap:12px;
+  }
+
+  .nav-links a {
+    font-size:9px;
+  }
+
+  .carousel-track {
+    gap:10px;
+  }
+
+  .product-card {
+    flex-basis:31%;
+  }
+
+  .product-image {
+    height:230px;
+  }
+}
+
+@media(max-width:760px) {
+  .navbar {
+    min-height:75px;
+  }
+
+  .brand-logo {
+    width:155px;
+    max-height:58px;
+  }
+
+  .menu-toggle {
+    display:block;
+  }
+
+  .nav-links {
+    position:absolute;
+    top:75px;
+    left:0;
+    right:0;
+    display:none;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:22px;
+    padding:25px 6%;
+    background:rgba(251,247,236,.98);
+    border:0;
+    box-shadow:none;
+  }
+
+  .nav-links.open {
+    display:flex;
+  }
+
+  .nav-links a {
+    font-size:12px;
+    letter-spacing:1.1px;
+  }
+
+  .hero {
+    min-height:580px;
+    background-position:60% center;
+  }
+
+  .hero::before {
+    height:150px;
+  }
+
+  .hero-content {
+    margin:auto;
+    padding:75px 0;
+  }
+
+  .collection-grid {
+    grid-template-columns:1fr;
+  }
+
+  .collection-card {
+    min-height:360px;
+  }
+
+  .collection-content {
+    padding:30px;
+  }
+
+  .carousel-track {
+    min-height:385px;
+    gap:0;
+  }
+
+  .product-card {
+    flex:0 0 48%;
+    max-width:290px;
+    transform:scale(.72);
+    margin:0 -9%;
+  }
+
+  .product-card.active {
+    transform:scale(1);
+    z-index:3;
+  }
+
+  .product-image {
+    height:210px;
+  }
+
+  .product-info {
+    padding:18px 10px 20px;
+  }
+
+  .product-info h3 {
+    font-size:23px;
+  }
+
+  .carousel-arrow {
+    width:37px;
+    height:37px;
+    font-size:19px;
+  }
+
+  .experience-grid {
+    grid-template-columns:1fr;
+    gap:15px;
+  }
+
+  .footer-content {
+    grid-template-columns:1fr 1fr;
+    gap:35px;
+  }
+
+  .footer-brand {
+    grid-column:1/-1;
+  }
+}
+
+@media(max-width:420px) {
+  .hero h1 {
+    font-size:68px;
+  }
+
+  .carousel-track {
+    min-height:365px;
+  }
+
+  .product-card {
+    flex-basis:58%;
+    margin:0 -18%;
+    transform:scale(.67);
+  }
+
+  .product-card.active {
+    transform:scale(.94);
+  }
+
+  .product-image {
+    height:180px;
+  }
+
+  .product-info h3 {
+    font-size:21px;
+  }
+
+  .product-info p {
+    font-size:9px;
+  }
+
+  .carousel-arrow.prev {
+    left:0;
+  }
+
+  .carousel-arrow.next {
+    right:0;
+  }
+
+  .footer-content {
+    grid-template-columns:1fr;
+  }
+
+  .footer-brand {
+    grid-column:auto;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <!-- =========================================================
-       INTRO
-  ========================================================= -->
+<!-- INTRO -->
+<div class="intro" id="intro">
+  <video id="introVideo" autoplay muted playsinline>
+    <source id="introSource" src="assets/intro.mp4" type="video/mp4">
+  </video>
+  <div class="intro-overlay"></div>
+  <button class="skip-intro" id="skipIntro">ENTRAR NO SITE</button>
+</div>
 
-  <section class="intro-screen" id="introScreen">
-    <video
-      class="intro-video"
-      id="introVideo"
-      autoplay
-      muted
-      playsinline
-      webkit-playsinline
-      preload="auto"
-      disablepictureinpicture
-      disableremoteplayback
-      aria-hidden="true"
-    >
-      <source id="introSource" src="assets/intro.mp4" type="video/mp4">
-    </video>
+<!-- CABEÇALHO -->
+<header class="header">
+  <div class="container navbar">
+    <a href="#inicio" class="brand">
+      <img
+        src="assets/logo/logo.barra.site.png"
+        alt="LUMÈ BLOOM — Essência que Floresce"
+        class="brand-logo"
+      >
+    </a>
 
-    <button
-      class="intro-fallback"
-      id="introFallback"
-      type="button"
-    >
-      Entrar na experiência
-    </button>
-  </section>
+    <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
 
-  <!-- =========================================================
-       LOGO DE FUNDO
-       Marca d'água fixa, centralizada, atrás de todo o conteúdo
-       (efeito "papel timbrado"). Fundo já removido da logo real.
-  ========================================================= -->
-<!-- =========================================================
-       SITE
-  ========================================================= -->
-
-  <main class="main-site">
-
-    <nav class="navbar">
-      <div class="navbar-brand">
-        <img src="assets/logo/logobarra.png" alt="Lumè Bloom">
-      </div>
-
-      <ul class="navbar-links">
-        <li><button class="navbar-link" type="button">Início</button></li>
-        <li><button class="navbar-link" type="button">Loja</button></li>
-        <li><button class="navbar-link" type="button">Meus Pedidos</button></li>
-        <li><button class="navbar-link" type="button">Contato</button></li>
-      </ul>
+    <nav class="nav-links" id="navLinks">
+      <a href="#inicio">Início</a>
+      <a href="#beleza">Beleza & Autocuidado</a>
+      <a href="#casa">Casa & Aromatização</a>
+      <a href="#kits">Kits Especiais</a>
+      <a href="#pedidos">Meus Pedidos</a>
+      <a href="#contato">Contato</a>
     </nav>
+  </div>
+</header>
 
-    <section class="hero">
-      <div class="hero-eyebrow">Uma experiência sensorial</div>
+<main>
 
-      <h1 class="hero-title">
-        Essência que Floresce
-      </h1>
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-content">
+    <span class="eyebrow">LUMÈ BLOOM · ESSÊNCIA E BEM-ESTAR</span>
+    <h1>Essência que<br>Floresce.</h1>
+    <p>
+      Descubra uma coleção criada para transformar pequenos momentos
+      em experiências de cuidado, beleza, aconchego e presença.
+    </p>
+    <a href="#colecoes" class="primary-button">Conheça nossas coleções</a>
+  </div>
+</section>
 
-      <p class="hero-description">
-        Descubra uma coleção criada para transformar pequenos momentos
-        em experiências de cuidado, beleza e presença.
+<!-- APRESENTAÇÃO -->
+<section class="brand-intro">
+  <div class="container">
+    <span class="eyebrow">MAIS DO QUE PRODUTOS</span>
+    <h2>Um convite para sentir.</h2>
+    <p>
+      Acreditamos que a beleza está nos detalhes e que cada ambiente,
+      cada cuidado e cada aroma podem transformar a maneira como
+      vivemos nossos dias. A LUMÈ BLOOM reúne produtos pensados
+      para despertar sensações e tornar a rotina mais especial.
+    </p>
+  </div>
+</section>
+
+<!-- COLEÇÕES -->
+<section class="collections" id="colecoes">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">DESCUBRA LUMÈ BLOOM</span>
+      <h2>Nossas coleções</h2>
+      <p>
+        Duas formas de transformar momentos cotidianos em experiências
+        de cuidado, beleza e bem-estar.
       </p>
-    </section>
+    </div>
 
-    <!-- =======================================================
-         CARROSSEL
-    ======================================================== -->
-
-    <section class="carousel-section">
-
-      <div class="carousel-wrapper">
-
-        <button
-          class="nav-arrow left"
-          id="prevButton"
-          type="button"
-          aria-label="Produto anterior"
-        >
-          <span>‹</span>
-        </button>
-
-        <div class="carousel-viewport" id="carouselViewport">
-
-          <div class="carousel-track" id="carouselTrack">
-
-            <!-- SABONETES -->
-            <article class="carousel-card">
-              <div class="card-image">
-                <div class="card-placeholder">
-                  Sabonetes
-                </div>
-              </div>
-
-              <div class="card-info">
-                <h2 class="card-title">
-                  Sabonetes
-                </h2>
-
-                <p class="card-description">
-                  Cuidado delicado para transformar o banho
-                  em um momento especial.
-                </p>
-              </div>
-            </article>
-
-            <!-- BODY SPLASH -->
-            <article class="carousel-card">
-              <div class="card-image">
-                <div class="card-placeholder">
-                  Body Splash
-                </div>
-              </div>
-
-              <div class="card-info">
-                <h2 class="card-title">
-                  Body Splash
-                </h2>
-
-                <p class="card-description">
-                  Fragrâncias leves para acompanhar
-                  todos os seus momentos.
-                </p>
-              </div>
-            </article>
-
-            <!-- DIFUSORES -->
-            <article class="carousel-card">
-              <div class="card-image">
-                <div class="card-placeholder">
-                  Difusores
-                </div>
-              </div>
-
-              <div class="card-info">
-                <h2 class="card-title">
-                  Difusores
-                </h2>
-
-                <p class="card-description">
-                  Aromas que transformam ambientes
-                  e despertam sensações.
-                </p>
-              </div>
-            </article>
-
-            <!-- ESCALDA-PÉS -->
-            <article class="carousel-card">
-              <div class="card-image">
-                <div class="card-placeholder">
-                  Escalda-Pés
-                </div>
-              </div>
-
-              <div class="card-info">
-                <h2 class="card-title">
-                  Escalda-Pés
-                </h2>
-
-                <p class="card-description">
-                  Um convite para desacelerar,
-                  respirar e cuidar de si.
-                </p>
-              </div>
-            </article>
-
-            <!-- KITS -->
-            <article class="carousel-card">
-              <div class="card-image">
-                <div class="card-placeholder">
-                  Kits Especiais
-                </div>
-              </div>
-
-              <div class="card-info">
-                <h2 class="card-title">
-                  Kits Especiais
-                </h2>
-
-                <p class="card-description">
-                  Combinações pensadas para presentear
-                  e criar memórias.
-                </p>
-              </div>
-            </article>
-
-          </div>
+    <div class="collection-grid">
+      <article class="collection-card beauty">
+        <div class="collection-content">
+          <span class="eyebrow">CUIDADO E BELEZA</span>
+          <h3>Beleza & Autocuidado</h3>
+          <p>
+            Produtos para cuidar do corpo, despertar os sentidos
+            e valorizar seus momentos de pausa.
+          </p>
+          <a href="#beleza">Explorar coleção</a>
         </div>
+      </article>
 
-        <button
-          class="nav-arrow right"
-          id="nextButton"
-          type="button"
-          aria-label="Próximo produto"
-        >
-          <span>›</span>
-        </button>
+      <article class="collection-card home">
+        <div class="collection-content">
+          <span class="eyebrow">AROMAS E AMBIENTES</span>
+          <h3>Casa & Aromatização</h3>
+          <p>
+            Fragrâncias que acolhem, perfumam e deixam sua casa
+            com uma identidade especial.
+          </p>
+          <a href="#casa">Explorar coleção</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
 
+<!-- BELEZA -->
+<section class="products-section" id="beleza">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">SEU MOMENTO DE CUIDADO</span>
+      <h2>Beleza & Autocuidado</h2>
+      <p>
+        Uma seleção de produtos para transformar sua rotina
+        em um ritual de carinho e bem-estar.
+      </p>
+    </div>
+
+    <div class="carousel-wrapper" data-carousel="beleza">
+      <button class="carousel-arrow prev" aria-label="Produto anterior">‹</button>
+      <div class="carousel-track"></div>
+      <button class="carousel-arrow next" aria-label="Próximo produto">›</button>
+      <div class="carousel-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- KITS -->
+<section class="products-section kits-section" id="kits">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">PRESENTEIE COM AFETO</span>
+      <h2>Kits Especiais</h2>
+      <p>
+        Combinações especiais para presentear alguém querido
+        ou tornar seus próprios momentos ainda mais especiais.
+      </p>
+    </div>
+
+    <div class="carousel-wrapper" data-carousel="kits">
+      <button class="carousel-arrow prev" aria-label="Kit anterior">‹</button>
+      <div class="carousel-track"></div>
+      <button class="carousel-arrow next" aria-label="Próximo kit">›</button>
+      <div class="carousel-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CASA -->
+<section class="products-section alternate" id="casa">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">SUA CASA, SUA ESSÊNCIA</span>
+      <h2>Casa & Aromatização</h2>
+      <p>
+        Aromas que transformam ambientes em espaços acolhedores,
+        cheios de personalidade e boas sensações.
+      </p>
+    </div>
+
+    <div class="carousel-wrapper" data-carousel="casa">
+      <button class="carousel-arrow prev" aria-label="Produto anterior">‹</button>
+      <div class="carousel-track"></div>
+      <button class="carousel-arrow next" aria-label="Próximo produto">›</button>
+      <div class="carousel-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIÊNCIA -->
+<section class="experience">
+  <div class="container">
+    <div class="section-heading">
+      <span class="eyebrow">A ESSÊNCIA DA MARCA</span>
+      <h2>Detalhes que fazem sentir.</h2>
+    </div>
+
+    <div class="experience-grid">
+      <article class="experience-item">
+        <div class="experience-icon">✧</div>
+        <h3>Cuidado</h3>
+        <p>Pequenos rituais que tornam a rotina mais leve e especial.</p>
+      </article>
+
+      <article class="experience-item">
+        <div class="experience-icon">❋</div>
+        <h3>Bem-estar</h3>
+        <p>Sensações e fragrâncias para momentos de pausa e aconchego.</p>
+      </article>
+
+      <article class="experience-item">
+        <div class="experience-icon">✦</div>
+        <h3>Essência</h3>
+        <p>Uma experiência que valoriza os detalhes e a personalidade de cada ambiente.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section class="instagram" id="contato">
+  <div class="container">
+    <span class="eyebrow">ACOMPANHE A LUMÈ BLOOM</span>
+    <h2>Floresça com a gente.</h2>
+    <p>
+      Acompanhe novidades, lançamentos, inspirações
+      e momentos especiais da nossa marca.
+    </p>
+    <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="outline-button">
+      Conhecer nosso Instagram
+    </a>
+  </div>
+</section>
+
+<!-- PEDIDOS -->
+<section class="orders" id="pedidos">
+  <div class="container">
+    <span class="eyebrow">SUA EXPERIÊNCIA LUMÈ BLOOM</span>
+    <h2>Meus pedidos</h2>
+    <p>
+      Acompanhe suas compras diretamente pela plataforma
+      onde realizou seu pedido.
+    </p>
+
+    <div class="marketplace-buttons">
+      <a href="https://www.mercadolivre.com.br/" target="_blank" rel="noopener noreferrer" class="outline-button">Mercado Livre</a>
+      <a href="https://shopee.com.br/" target="_blank" rel="noopener noreferrer" class="outline-button">Shopee</a>
+      <a href="https://www.tiktok.com/shop" target="_blank" rel="noopener noreferrer" class="outline-button">TikTok Shop</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+
+      <div class="footer-brand">
+        <span class="brand-name">LUMÈ BLOOM</span>
+        <p>
+          Essência que Floresce. Produtos de beleza, autocuidado
+          e aromatização para transformar pequenos momentos
+          em experiências especiais.
+        </p>
       </div>
 
-      <div class="carousel-dots" id="carouselDots"></div>
+      <div>
+        <h3>Navegação</h3>
+        <div class="footer-links">
+          <a href="#inicio">Início</a>
+          <a href="#beleza">Beleza & Autocuidado</a>
+          <a href="#casa">Casa & Aromatização</a>
+          <a href="#kits">Kits Especiais</a>
+        </div>
+      </div>
 
-    </section>
+      <div>
+        <h3>Conecte-se</h3>
+        <div class="footer-links">
+          <a href="#contato">Instagram</a>
+          <a href="#contato">Contato</a>
+          <a href="#pedidos">Meus pedidos</a>
+        </div>
+      </div>
 
-  </main>
+    </div>
 
-  <script>
-    /* =========================================================
-       INTRO — AUTOPLAY + FORMATO RESPONSIVO
-       - Desktop: assets/intro.mp4  (16:9)
-       - Tablet:  assets/intro-tablet.mp4 (idealmente 4:3)
-       - Celular: assets/intro-mobile.mp4 (idealmente 9:16)
-       - Se a versão específica não existir, volta automaticamente
-         para o vídeo desktop original.
-    ========================================================= */
+    <div class="copyright">
+      © <span id="year"></span> LUMÈ BLOOM — TODOS OS DIREITOS RESERVADOS.
+    </div>
+  </div>
+</footer>
 
-    const introScreen = document.getElementById("introScreen");
-    const introVideo = document.getElementById("introVideo");
-    const introFallback = document.getElementById("introFallback");
-    const introSource = document.getElementById("introSource");
+<script>
+/* INTRO */
 
-    let introClosed = false;
-    let introPlayTimer = null;
-    let introFallbackAttempted = false;
+const intro = document.getElementById('intro');
+const introVideo = document.getElementById('introVideo');
+const introSource = document.getElementById('introSource');
+const skipIntro = document.getElementById('skipIntro');
 
-    introVideo.muted = true;
-    introVideo.defaultMuted = true;
-    introVideo.playsInline = true;
-    introVideo.autoplay = true;
-    introVideo.controls = false;
+let introClosed = false;
 
-    introVideo.setAttribute("muted", "");
-    introVideo.setAttribute("autoplay", "");
-    introVideo.setAttribute("playsinline", "");
-    introVideo.setAttribute("webkit-playsinline", "");
-    introVideo.setAttribute("disablepictureinpicture", "");
-    introVideo.setAttribute("disableremoteplayback", "");
+function closeIntro() {
+  if (introClosed) return;
 
-    function getIntroSource() {
-      const width = window.innerWidth;
+  introClosed = true;
+  intro.classList.add('hidden');
 
-      if (width <= 600) {
-        return "assets/intro-mobile.mp4";
-      }
+  setTimeout(() => {
+    intro.style.display = 'none';
+  }, 1100);
+}
 
-      if (width <= 1100) {
-        return "assets/intro-tablet.mp4";
-      }
+function selectIntroVideo() {
+  const width = window.innerWidth;
 
-      return "assets/intro.mp4";
+  let videoPath = 'assets/intro.mp4';
+
+  if (width <= 600) {
+    videoPath = 'assets/intro-mobile.mp4';
+  } else if (width <= 1100) {
+    videoPath = 'assets/intro-tablet.mp4';
+  }
+
+  introSource.src = videoPath;
+  introVideo.load();
+
+  introVideo.play().catch(() => {
+    closeIntro();
+  });
+}
+
+introVideo.addEventListener('ended', closeIntro);
+introVideo.addEventListener('error', closeIntro);
+skipIntro.addEventListener('click', closeIntro);
+
+selectIntroVideo();
+
+/* MENU MOBILE */
+
+const menuToggle = document.getElementById('menuToggle');
+const navLinks = document.getElementById('navLinks');
+
+menuToggle.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+  menuToggle.textContent = navLinks.classList.contains('open') ? '×' : '☰';
+});
+
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    menuToggle.textContent = '☰';
+  });
+});
+
+/* DADOS DOS PRODUTOS */
+
+const catalogos = {
+  beleza: [
+    {
+      nome:'Sabonete em Barra',
+      categoria:'Autocuidado',
+      descricao:'Um cuidado delicado para sua rotina.'
+    },
+    {
+      nome:'Sabonete Líquido',
+      categoria:'Autocuidado',
+      descricao:'Limpeza e cuidado em cada aplicação.'
+    },
+    {
+      nome:'Body Splash',
+      categoria:'Perfumação corporal',
+      descricao:'Uma experiência perfumada para o dia a dia.'
+    },
+    {
+      nome:'Hidratante',
+      categoria:'Hidratação',
+      descricao:'Um momento de cuidado e suavidade.'
+    },
+    {
+      nome:'Escalda-Pés',
+      categoria:'Relaxamento',
+      descricao:'Uma pausa especial para renovar as energias.'
+    },
+    {
+      nome:'Sais de Banho com Espuma',
+      categoria:'Banho e bem-estar',
+      descricao:'Um convite para desacelerar e aproveitar.'
+    },
+    {
+      nome:'Esfoliante Corporal',
+      categoria:'Autocuidado',
+      descricao:'Um ritual de cuidado para a pele.'
+    }
+  ],
+
+  casa: [
+    {
+      nome:'Difusor de Varetas',
+      categoria:'Aromatização',
+      descricao:'Perfume e elegância para seus ambientes.'
+    },
+    {
+      nome:'Difusor Elétrico',
+      categoria:'Aromatização',
+      descricao:'Uma maneira especial de perfumar sua casa.'
+    },
+    {
+      nome:'Home Spray para Ambientes',
+      categoria:'Perfume para ambientes',
+      descricao:'Uma fragrância para renovar o ambiente.'
+    },
+    {
+      nome:'Perfume para Tecidos',
+      categoria:'Perfume para casa',
+      descricao:'Um toque perfumado para seus tecidos.'
+    },
+    {
+      nome:'Sachê Perfumado para Armários',
+      categoria:'Perfume para armários',
+      descricao:'Delicadeza e perfume para seus espaços.'
+    }
+  ],
+
+  kits: [
+    {
+      nome:'Kit Autocuidado',
+      categoria:'Kits especiais',
+      descricao:'Uma combinação especial para seus momentos de cuidado.'
+    },
+    {
+      nome:'Kit Casa Perfumada',
+      categoria:'Kits especiais',
+      descricao:'Uma seleção para deixar seus ambientes acolhedores.'
+    },
+    {
+      nome:'Kit Presente Especial',
+      categoria:'Presentes',
+      descricao:'Um presente pensado para surpreender e encantar.'
+    }
+  ]
+};
+
+/* CARROSSEL COM LOOP INFINITO */
+
+class InfiniteCarousel {
+  constructor(wrapper, products) {
+    this.wrapper = wrapper;
+    this.track = wrapper.querySelector('.carousel-track');
+    this.dotsContainer = wrapper.querySelector('.carousel-dots');
+    this.prevButton = wrapper.querySelector('.prev');
+    this.nextButton = wrapper.querySelector('.next');
+
+    this.products = products;
+    this.index = 0;
+    this.timer = null;
+    this.touchStartX = 0;
+    this.touchEndX = 0;
+
+    this.render();
+    this.bindEvents();
+    this.startAutoPlay();
+  }
+
+  getProduct(index) {
+    const total = this.products.length;
+    return this.products[(index + total) % total];
+  }
+
+  createCard(product, position) {
+    const card = document.createElement('article');
+
+    card.className = 'product-card';
+
+    if (position === 'center') {
+      card.classList.add('active');
+    } else {
+      card.classList.add('side');
     }
 
-    function setIntroSource() {
-      const desiredSource = getIntroSource();
-      const desktopSource = "assets/intro.mp4";
+    card.innerHTML = `
+      <div class="product-image">
+        <div class="image-placeholder">${product.nome}</div>
+      </div>
 
-      if (!introSource) return;
+      <div class="product-info">
+        <small>${product.categoria}</small>
+        <h3>${product.nome}</h3>
+        <p>${product.descricao}</p>
+        <a href="#contato">Conhecer produto</a>
+      </div>
+    `;
 
-      introFallbackAttempted = false;
-      introSource.src = desiredSource;
+    return card;
+  }
 
-      introVideo.load();
+  render() {
+    const previous = this.getProduct(this.index - 1);
+    const current = this.getProduct(this.index);
+    const next = this.getProduct(this.index + 1);
 
-      // Se o arquivo específico de celular/tablet não existir,
-      // o evento error abaixo troca para o desktop.
-      introVideo.dataset.desktopSource = desktopSource;
-    }
+    this.track.innerHTML = '';
 
-    function scrollSiteToTop() {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    }
+    this.track.appendChild(this.createCard(previous, 'side'));
+    this.track.appendChild(this.createCard(current, 'center'));
+    this.track.appendChild(this.createCard(next, 'side'));
 
-    function closeIntro() {
-      if (introClosed) return;
+    this.renderDots();
+  }
 
-      introClosed = true;
-      clearTimeout(introPlayTimer);
+  renderDots() {
+    this.dotsContainer.innerHTML = '';
 
-      scrollSiteToTop();
-      introScreen.classList.add("hidden");
+    this.products.forEach((product, position) => {
+      const dot = document.createElement('button');
 
-      setTimeout(() => {
-        introScreen.style.display = "none";
-        scrollSiteToTop();
-      }, 850);
-    }
+      dot.className = 'carousel-dot';
 
-    function tryPlayIntro() {
-      if (introClosed || !introVideo) return;
-
-      introVideo.muted = true;
-      introVideo.defaultMuted = true;
-      introVideo.playsInline = true;
-
-      const playPromise = introVideo.play();
-
-      if (playPromise && typeof playPromise.catch === "function") {
-        playPromise.catch(() => {
-          // O navegador ainda pode estar aguardando dados.
-          // Não mostramos botão: tentamos novamente silenciosamente.
-          clearTimeout(introPlayTimer);
-
-          introPlayTimer = setTimeout(() => {
-            if (!introClosed && introVideo.paused) {
-              tryPlayIntro();
-            }
-          }, 500);
-        });
+      if (position === this.index) {
+        dot.classList.add('active');
       }
-    }
 
-    introVideo.addEventListener("loadedmetadata", tryPlayIntro);
-    introVideo.addEventListener("loadeddata", tryPlayIntro);
-    introVideo.addEventListener("canplay", tryPlayIntro);
-    introVideo.addEventListener("canplaythrough", tryPlayIntro);
+      dot.setAttribute('aria-label', `Ir para ${product.nome}`);
 
-    introVideo.addEventListener("playing", () => {
-      introFallback?.classList.remove("visible");
-      clearTimeout(introPlayTimer);
-    });
-
-    introVideo.addEventListener("ended", closeIntro);
-
-    introVideo.addEventListener("error", () => {
-      const desktopSource = introVideo.dataset.desktopSource || "assets/intro.mp4";
-
-      // Tenta uma única vez voltar ao desktop se a versão
-      // mobile/tablet não estiver presente ou estiver indisponível.
-      if (!introFallbackAttempted && introSource && introSource.src.indexOf(desktopSource) === -1) {
-        introFallbackAttempted = true;
-        introSource.src = desktopSource;
-        introVideo.load();
-        tryPlayIntro();
-      }
-    });
-
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "visible") {
-        tryPlayIntro();
-      }
-    });
-
-    window.addEventListener("pageshow", tryPlayIntro);
-
-    // Em navegadores que liberam a reprodução após a primeira interação,
-    // a tentativa é refeita automaticamente, sem abrir player/botão.
-    document.addEventListener(
-      "touchstart",
-      () => {
-        if (!introClosed && introVideo.paused) {
-          tryPlayIntro();
-        }
-      },
-      { once: true, passive: true }
-    );
-
-    document.addEventListener(
-      "click",
-      () => {
-        if (!introClosed && introVideo.paused) {
-          tryPlayIntro();
-        }
-      },
-      { once: true, passive: true }
-    );
-
-    setIntroSource();
-    tryPlayIntro();
-
-    /* =========================================================
-       CARROSSEL — LOOP INFINITO SOB COMANDO
-       O carrossel permanece parado.
-       As flechas, os indicadores e o swipe avançam/voltam
-       suavemente entre os cards. Os conjuntos clonados garantem
-       o loop infinito sem salto visual ao chegar ao início/fim.
-    ========================================================= */
-
-    const viewport = document.getElementById("carouselViewport");
-    const track = document.getElementById("carouselTrack");
-    const prevButton = document.getElementById("prevButton");
-    const nextButton = document.getElementById("nextButton");
-    const dotsContainer = document.getElementById("carouselDots");
-
-    const originalCards = Array.from(track.querySelectorAll(".carousel-card"));
-    const cardsPerSet = originalCards.length;
-
-    let cards = [];
-    let setWidth = 0;
-    let positionX = 0;
-
-    /*
-      Movimento contínuo:
-      - o carrossel fica parado até o usuário comandar;
-      - cada clique altera imediatamente o destino;
-      - se o usuário clicar várias vezes, o destino vai sendo
-        ampliado e o track continua deslizando sem "frear e arrancar";
-      - o destino é alcançado com velocidade controlada e amortecimento,
-        produzindo uma transição fluida entre cards.
-    */
-    let targetX = 0;
-    let motionFrame = null;
-    let motionRunning = false;
-    let lastMotionTime = 0;
-
-    const MOVE_SPEED = 1450;       // px/s para um clique rápido
-    const ARRIVAL_SPEED = 9.5;     // suavidade ao chegar no alvo
-    const MAX_TARGET_DISTANCE = 40;
-
-    let lastActiveIndex = -1;
-
-    function buildInfiniteTrack() {
-      track.innerHTML = "";
-
-      const sets = [
-        originalCards.map(card => card.cloneNode(true)),
-        originalCards.map(card => card.cloneNode(true)),
-        originalCards.map(card => card.cloneNode(true))
-      ];
-
-      sets.forEach(set => {
-        set.forEach(card => track.appendChild(card));
+      dot.addEventListener('click', () => {
+        this.goTo(position);
       });
 
-      cards = Array.from(track.querySelectorAll(".carousel-card"));
-    }
+      this.dotsContainer.appendChild(dot);
+    });
+  }
 
-    function getCardStep() {
-      if (cards.length < 2) return 0;
+  next() {
+    this.index = (this.index + 1) % this.products.length;
+    this.render();
+  }
 
-      return cards[1].offsetLeft - cards[0].offsetLeft;
-    }
+  previous() {
+    this.index = (this.index - 1 + this.products.length) % this.products.length;
+    this.render();
+  }
 
-    function getSetWidth() {
-      if (!cards.length || cardsPerSet <= 0) return 0;
+  goTo(position) {
+    this.index = position;
+    this.render();
+    this.restartAutoPlay();
+  }
 
-      return cards[cardsPerSet * 2].offsetLeft -
-        cards[cardsPerSet].offsetLeft;
-    }
-
-    function getCenterPositionForCard(card) {
-      if (!card) return positionX;
-
-      const viewportWidth = viewport.clientWidth;
-      const cardWidth = card.getBoundingClientRect().width;
-
-      return (
-        viewportWidth / 2 -
-        cardWidth / 2 -
-        card.offsetLeft
-      );
-    }
-
-    function getClosestCardIndex() {
-      if (!cards.length) return cardsPerSet;
-
-      const center = viewport.clientWidth / 2;
-      let closestIndex = cardsPerSet;
-      let closestDistance = Infinity;
-
-      cards.forEach((card, index) => {
-        const width = card.getBoundingClientRect().width;
-        const cardCenter =
-          card.offsetLeft +
-          positionX +
-          width / 2;
-
-        const distance = Math.abs(cardCenter - center);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestIndex = index;
-        }
-      });
-
-      return closestIndex;
-    }
-
-    function normalizePosition() {
-      if (!setWidth) return;
-
-      /*
-        A troca acontece somente por um conjunto inteiro.
-        Os três conjuntos são idênticos, então a posição visual
-        permanece exatamente equivalente.
-      */
-      while (positionX < -setWidth * 1.5) {
-        positionX += setWidth;
-        targetX += setWidth;
-      }
-
-      while (positionX > -setWidth * 0.5) {
-        positionX -= setWidth;
-        targetX -= setWidth;
-      }
-    }
-
-    function updateActiveCard() {
-      if (!cards.length) return;
-
-      const closestIndex = getClosestCardIndex();
-
-      cards.forEach((card, index) => {
-        card.classList.toggle("active", index === closestIndex);
-      });
-
-      if (closestIndex !== lastActiveIndex) {
-        lastActiveIndex = closestIndex;
-
-        const realIndex =
-          ((closestIndex % cardsPerSet) + cardsPerSet) % cardsPerSet;
-
-        Array.from(dotsContainer.children).forEach((dot, index) => {
-          dot.classList.toggle("active", index === realIndex);
-        });
-      }
-    }
-
-    function render() {
-      normalizePosition();
-
-      track.style.transition = "none";
-      track.style.transform =
-        "translate3d(" +
-        positionX.toFixed(3) +
-        "px, 0, 0)";
-
-      updateActiveCard();
-    }
-
-    function startMotionLoop() {
-      if (motionRunning) return;
-
-      motionRunning = true;
-      lastMotionTime = performance.now();
-      motionFrame = requestAnimationFrame(motionStep);
-    }
-
-    function stopMotionLoop() {
-      motionRunning = false;
-
-      if (motionFrame) {
-        cancelAnimationFrame(motionFrame);
-        motionFrame = null;
-      }
-    }
-
-    function motionStep(now) {
-      if (!motionRunning) return;
-
-      const deltaTime = Math.min(
-        0.033,
-        Math.max(0.001, (now - lastMotionTime) / 1000)
-      );
-
-      lastMotionTime = now;
-
-      const distance = targetX - positionX;
-
-      /*
-        Velocidade constante na maior parte do percurso.
-        Perto do alvo, desacelera suavemente.
-        Assim um clique não dá a sensação de "travar" no meio.
-      */
-      const distanceAbs = Math.abs(distance);
-
-      if (distanceAbs > 0.8) {
-        const direction = Math.sign(distance);
-
-        const arrivalFactor = Math.min(
-          1,
-          distanceAbs / MAX_TARGET_DISTANCE
-        );
-
-        const speed =
-          MOVE_SPEED *
-          (0.72 + 0.28 * arrivalFactor);
-
-        const maxStep = speed * deltaTime;
-
-        positionX +=
-          direction *
-          Math.min(distanceAbs, maxStep);
-
-        // Nos últimos pixels, um amortecimento suave evita estalo.
-        const remaining =
-          targetX - positionX;
-
-        if (Math.abs(remaining) < 0.8) {
-          positionX = targetX;
-        }
-      } else {
-        positionX = targetX;
-      }
-
-      render();
-
-      if (Math.abs(targetX - positionX) > 0.8) {
-        motionFrame = requestAnimationFrame(motionStep);
-        return;
-      }
-
-      positionX = targetX;
-      render();
-
-      stopMotionLoop();
-    }
-
-    function moveByCards(numberOfCards) {
-      if (!cards.length) return;
-
-      const step = getCardStep();
-      if (!step) return;
-
-      /*
-        Em vez de iniciar uma nova animação do zero, apenas mudamos
-        o destino. Isso é o que elimina a sensação de "trava".
-      */
-      targetX += -numberOfCards * step;
-
-      normalizeTarget();
-
-      startMotionLoop();
-    }
-
-    function normalizeTarget() {
-      if (!setWidth) return;
-
-      while (targetX < -setWidth * 1.5) {
-        targetX += setWidth;
-        positionX += setWidth;
-      }
-
-      while (targetX > -setWidth * 0.5) {
-        targetX -= setWidth;
-        positionX -= setWidth;
-      }
-    }
-
-    function nextCard() {
-      moveByCards(1);
-    }
-
-    function previousCard() {
-      moveByCards(-1);
-    }
-
-    prevButton.addEventListener("click", previousCard);
-    nextButton.addEventListener("click", nextCard);
-
-    [prevButton, nextButton].forEach(btn => {
-      btn.addEventListener(
-        "touchstart",
-        () => btn.classList.add("touched"),
-        { passive: true }
-      );
-
-      btn.addEventListener(
-        "touchend",
-        () => {
-          setTimeout(
-            () => btn.classList.remove("touched"),
-            900
-          );
-        },
-        { passive: true }
-      );
+  bindEvents() {
+    this.nextButton.addEventListener('click', () => {
+      this.next();
+      this.restartAutoPlay();
     });
 
-    function createDots() {
-      dotsContainer.innerHTML = "";
+    this.prevButton.addEventListener('click', () => {
+      this.previous();
+      this.restartAutoPlay();
+    });
 
-      for (let i = 0; i < cardsPerSet; i++) {
-        const dot = document.createElement("button");
+    this.wrapper.addEventListener('mouseenter', () => {
+      this.stopAutoPlay();
+    });
 
-        dot.type = "button";
-        dot.className = "carousel-dot";
-        dot.setAttribute(
-          "aria-label",
-          "Ir para produto " + (i + 1)
-        );
+    this.wrapper.addEventListener('mouseleave', () => {
+      this.startAutoPlay();
+    });
 
-        dot.addEventListener("click", () => {
-          if (!cards.length) return;
+    this.wrapper.addEventListener('touchstart', event => {
+      this.touchStartX = event.changedTouches[0].screenX;
+      this.stopAutoPlay();
+    }, { passive:true });
 
-          const currentIndex = getClosestCardIndex();
+    this.wrapper.addEventListener('touchend', event => {
+      this.touchEndX = event.changedTouches[0].screenX;
 
-          const currentReal =
-            ((currentIndex % cardsPerSet) + cardsPerSet) % cardsPerSet;
+      const difference = this.touchStartX - this.touchEndX;
 
-          let forward = i - currentReal;
-
-          if (forward > cardsPerSet / 2) {
-            forward -= cardsPerSet;
-          } else if (forward < -cardsPerSet / 2) {
-            forward += cardsPerSet;
-          }
-
-          if (!forward) return;
-
-          moveByCards(forward);
-        });
-
-        dotsContainer.appendChild(dot);
-      }
-    }
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    viewport.addEventListener(
-      "touchstart",
-      event => {
-        const touch = event.changedTouches[0];
-
-        touchStartX = touch.screenX;
-        touchStartY = touch.screenY;
-      },
-      { passive: true }
-    );
-
-    viewport.addEventListener(
-      "touchend",
-      event => {
-        const touch = event.changedTouches[0];
-
-        const dx = touch.screenX - touchStartX;
-        const dy = touch.screenY - touchStartY;
-
-        if (
-          Math.abs(dx) < 45 ||
-          Math.abs(dx) < Math.abs(dy)
-        ) {
-          return;
-        }
-
-        if (dx < 0) {
-          nextCard();
+      if (Math.abs(difference) > 40) {
+        if (difference > 0) {
+          this.next();
         } else {
-          previousCard();
+          this.previous();
         }
-      },
-      { passive: true }
-    );
+      }
 
-    let resizeTimer;
+      this.startAutoPlay();
+    }, { passive:true });
+  }
 
-    function handleResize() {
-      clearTimeout(resizeTimer);
+  startAutoPlay() {
+    this.stopAutoPlay();
 
-      resizeTimer = setTimeout(() => {
-        const currentIndex = getClosestCardIndex();
-        const currentCard = cards[currentIndex];
-
-        stopMotionLoop();
-
-        setWidth = getSetWidth();
-
-        if (currentCard) {
-          positionX =
-            getCenterPositionForCard(currentCard);
-
-          targetX = positionX;
-        }
-
-        normalizePosition();
-        normalizeTarget();
-        render();
-      }, 120);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
     }
 
-    window.addEventListener("resize", handleResize);
+    this.timer = setInterval(() => {
+      this.next();
+    }, 4000);
+  }
 
-    window.addEventListener("orientationchange", () => {
-      setTimeout(() => {
-        setIntroSource();
-        tryPlayIntro();
-
-        stopMotionLoop();
-
-        measureCarousel();
-        scrollSiteToTop();
-      }, 300);
-    });
-
-    function measureCarousel() {
-      if (!cards.length) return;
-
-      setWidth = getSetWidth();
-
-      const currentIndex = getClosestCardIndex();
-      const middleFirstCard = cards[cardsPerSet];
-      const targetCard = cards[currentIndex] || middleFirstCard;
-
-      positionX =
-        getCenterPositionForCard(targetCard);
-
-      targetX = positionX;
-
-      normalizePosition();
-      normalizeTarget();
-      render();
+  stopAutoPlay() {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
     }
+  }
 
-    buildInfiniteTrack();
-    createDots();
+  restartAutoPlay() {
+    this.stopAutoPlay();
+    this.startAutoPlay();
+  }
+}
 
-    requestAnimationFrame(() => {
-      measureCarousel();
-      scrollSiteToTop();
-    });
+/* INICIALIZA OS TRÊS CARROSSEIS */
 
-    window.addEventListener("load", () => {
-      measureCarousel();
-      tryPlayIntro();
-      scrollSiteToTop();
-    });
+document.querySelectorAll('[data-carousel]').forEach(wrapper => {
+  const category = wrapper.dataset.carousel;
+  new InfiniteCarousel(wrapper, catalogos[category]);
+});
 
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => {
-        measureCarousel();
-      });
-    }
+/* ANO AUTOMÁTICO */
 
-  </script>
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
 
 </body>
 </html>
