@@ -136,6 +136,9 @@ button {
   z-index:9999;
   background:#483C23;
   overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   transition:opacity 1s,visibility 1s;
 }
 
@@ -149,15 +152,15 @@ button {
   display:block;
   width:100%;
   height:100%;
-  object-fit:cover;
-  object-position:center;
+  object-fit:contain;
+  object-position:center center;
   background:#483C23;
 }
 
 .intro-overlay {
   position:absolute;
   inset:0;
-  background:rgba(72,60,35,.16);
+  background:rgba(72,60,35,.10);
   pointer-events:none;
 }
 
@@ -1046,7 +1049,7 @@ button {
   <div class="container navbar">
     <a href="#inicio" class="brand">
       <img
-        src="assets/logo/logo.barra.site.png"
+        src="assets/logo.barra.site.png"
         alt="LUMÈ BLOOM — Essência que Floresce"
         class="brand-logo"
       >
@@ -1305,45 +1308,25 @@ button {
 
 <script>
 
-/* INTRO - REPRODUÇÃO AUTOMÁTICA */
+/* INTRO - REPRODUÇÃO AUTOMÁTICA EM TODOS OS DISPOSITIVOS */
 
 const intro = document.getElementById('intro');
 const introVideo = document.getElementById('introVideo');
 const skipIntro = document.getElementById('skipIntro');
 
 let introClosed = false;
-let currentSourceIndex = 0;
-let playAttempts = 0;
 let retryTimer = null;
+let playAttempts = 0;
 
-const screenWidth = window.innerWidth;
+const videoPath = 'assets/intro.mp4';
 
-// Seleção do vídeo de acordo com o dispositivo.
-
-let videoSources = [];
-
-if (screenWidth <= 600) {
-  videoSources = [
-    'assets/intro-mobile.mp4',
-    'assets/intro.mp4'
-  ];
-} else if (screenWidth <= 1100) {
-  videoSources = [
-    'assets/intro-tablet.mp4',
-    'assets/intro.mp4'
-  ];
-} else {
-  videoSources = [
-    'assets/intro.mp4'
-  ];
-}
-
-// Configurações necessárias para autoplay.
+// Configurações de reprodução automática.
 
 introVideo.muted = true;
 introVideo.defaultMuted = true;
 introVideo.autoplay = true;
 introVideo.playsInline = true;
+introVideo.loop = false;
 
 introVideo.setAttribute('muted', '');
 introVideo.setAttribute('autoplay', '');
@@ -1362,7 +1345,6 @@ function closeIntro() {
   }
 
   introVideo.pause();
-
   intro.classList.add('hidden');
 
   setTimeout(() => {
@@ -1377,7 +1359,7 @@ function playIntro() {
 
   if (!introVideo.paused && !introVideo.ended) return;
 
-  if (playAttempts >= 5) return;
+  if (playAttempts >= 10) return;
 
   playAttempts++;
 
@@ -1389,33 +1371,21 @@ function playIntro() {
 
   if (playPromise !== undefined) {
     playPromise.catch(() => {
-      // Mantém a introdução visível.
-      // Novas tentativas serão realizadas.
+      // Mantém a introdução visível para novas tentativas.
     });
   }
 }
 
-// Carregar vídeo.
+// Carregar o único vídeo em todos os dispositivos.
 
-function loadIntroVideo() {
-  if (currentSourceIndex >= videoSources.length) {
-    console.error('Não foi possível carregar o vídeo da introdução.');
-    closeIntro();
-    return;
-  }
-
-  const videoPath = videoSources[currentSourceIndex];
-
-  introVideo.src = videoPath;
-  introVideo.load();
-
-  playAttempts = 0;
-}
+introVideo.src = videoPath;
+introVideo.load();
 
 // Quando o vídeo estiver pronto.
 
 introVideo.addEventListener('loadeddata', playIntro);
 introVideo.addEventListener('canplay', playIntro);
+
 introVideo.addEventListener('playing', () => {
   playAttempts = 0;
 });
@@ -1424,14 +1394,14 @@ introVideo.addEventListener('playing', () => {
 
 introVideo.addEventListener('ended', closeIntro);
 
-// Se houver erro no arquivo, tentar a alternativa.
+// Caso o arquivo não seja encontrado ou apresente erro.
 
 introVideo.addEventListener('error', () => {
-  currentSourceIndex++;
-  loadIntroVideo();
+  console.error('Erro ao carregar o vídeo:', videoPath);
+  closeIntro();
 });
 
-// Tentar novamente se o navegador interromper a reprodução.
+// Tentar novamente se a reprodução for interrompida.
 
 introVideo.addEventListener('pause', () => {
   if (!introClosed && !introVideo.ended) {
@@ -1465,10 +1435,6 @@ document.addEventListener('visibilitychange', () => {
 // Botão para entrar diretamente no site.
 
 skipIntro.addEventListener('click', closeIntro);
-
-// Iniciar carregamento.
-
-loadIntroVideo();
 
 
 /* MENU MOBILE */
