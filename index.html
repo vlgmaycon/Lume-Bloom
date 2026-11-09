@@ -135,6 +135,7 @@ button {
   inset:0;
   z-index:9999;
   background:#483C23;
+  overflow:hidden;
   transition:opacity 1s,visibility 1s;
 }
 
@@ -145,9 +146,12 @@ button {
 }
 
 .intro video {
+  display:block;
   width:100%;
   height:100%;
   object-fit:cover;
+  object-position:center;
+  background:#483C23;
 }
 
 .intro-overlay {
@@ -161,6 +165,7 @@ button {
   position:absolute;
   right:25px;
   bottom:25px;
+  z-index:2;
   padding:12px 18px;
   color:white;
   background:rgba(251,247,236,.12);
@@ -1016,11 +1021,24 @@ button {
 
 <!-- INTRO -->
 <div class="intro" id="intro">
-  <video id="introVideo" autoplay muted playsinline>
-    <source id="introSource" src="assets/intro.mp4" type="video/mp4">
-  </video>
+
+  <video
+    id="introVideo"
+    autoplay
+    muted
+    playsinline
+    webkit-playsinline
+    preload="auto"
+    disablepictureinpicture
+    controlslist="nodownload nofullscreen noremoteplayback"
+  ></video>
+
   <div class="intro-overlay"></div>
-  <button class="skip-intro" id="skipIntro">ENTRAR NO SITE</button>
+
+  <button class="skip-intro" id="skipIntro">
+    ENTRAR NO SITE
+  </button>
+
 </div>
 
 <!-- CABEÇALHO -->
@@ -1286,19 +1304,65 @@ button {
 </footer>
 
 <script>
-/* INTRO */
+
+/* INTRO - REPRODUÇÃO AUTOMÁTICA */
 
 const intro = document.getElementById('intro');
 const introVideo = document.getElementById('introVideo');
-const introSource = document.getElementById('introSource');
 const skipIntro = document.getElementById('skipIntro');
 
 let introClosed = false;
+let currentSourceIndex = 0;
+let playAttempts = 0;
+let retryTimer = null;
+
+const screenWidth = window.innerWidth;
+
+// Seleção do vídeo de acordo com o dispositivo.
+
+let videoSources = [];
+
+if (screenWidth <= 600) {
+  videoSources = [
+    'assets/intro-mobile.mp4',
+    'assets/intro.mp4'
+  ];
+} else if (screenWidth <= 1100) {
+  videoSources = [
+    'assets/intro-tablet.mp4',
+    'assets/intro.mp4'
+  ];
+} else {
+  videoSources = [
+    'assets/intro.mp4'
+  ];
+}
+
+// Configurações necessárias para autoplay.
+
+introVideo.muted = true;
+introVideo.defaultMuted = true;
+introVideo.autoplay = true;
+introVideo.playsInline = true;
+
+introVideo.setAttribute('muted', '');
+introVideo.setAttribute('autoplay', '');
+introVideo.setAttribute('playsinline', '');
+introVideo.setAttribute('webkit-playsinline', '');
+
+// Encerrar introdução.
 
 function closeIntro() {
   if (introClosed) return;
 
   introClosed = true;
+
+  if (retryTimer) {
+    clearInterval(retryTimer);
+  }
+
+  introVideo.pause();
+
   intro.classList.add('hidden');
 
   setTimeout(() => {
@@ -1306,30 +1370,106 @@ function closeIntro() {
   }, 1100);
 }
 
-function selectIntroVideo() {
-  const width = window.innerWidth;
+// Tentar reproduzir automaticamente.
 
-  let videoPath = 'assets/intro.mp4';
+function playIntro() {
+  if (introClosed || !introVideo.src) return;
 
-  if (width <= 600) {
-    videoPath = 'assets/intro-mobile.mp4';
-  } else if (width <= 1100) {
-    videoPath = 'assets/intro-tablet.mp4';
+  if (!introVideo.paused && !introVideo.ended) return;
+
+  if (playAttempts >= 5) return;
+
+  playAttempts++;
+
+  introVideo.muted = true;
+  introVideo.defaultMuted = true;
+  introVideo.playsInline = true;
+
+  const playPromise = introVideo.play();
+
+  if (playPromise !== undefined) {
+    playPromise.catch(() => {
+      // Mantém a introdução visível.
+      // Novas tentativas serão realizadas.
+    });
   }
-
-  introSource.src = videoPath;
-  introVideo.load();
-
-  introVideo.play().catch(() => {
-    closeIntro();
-  });
 }
 
+// Carregar vídeo.
+
+function loadIntroVideo() {
+  if (currentSourceIndex >= videoSources.length) {
+    console.error('Não foi possível carregar o vídeo da introdução.');
+    closeIntro();
+    return;
+  }
+
+  const videoPath = videoSources[currentSourceIndex];
+
+  introVideo.src = videoPath;
+  introVideo.load();
+
+  playAttempts = 0;
+}
+
+// Quando o vídeo estiver pronto.
+
+introVideo.addEventListener('loadeddata', playIntro);
+introVideo.addEventListener('canplay', playIntro);
+introVideo.addEventListener('playing', () => {
+  playAttempts = 0;
+});
+
+// Quando o vídeo terminar.
+
 introVideo.addEventListener('ended', closeIntro);
-introVideo.addEventListener('error', closeIntro);
+
+// Se houver erro no arquivo, tentar a alternativa.
+
+introVideo.addEventListener('error', () => {
+  currentSourceIndex++;
+  loadIntroVideo();
+});
+
+// Tentar novamente se o navegador interromper a reprodução.
+
+introVideo.addEventListener('pause', () => {
+  if (!introClosed && !introVideo.ended) {
+    playAttempts = 0;
+  }
+});
+
+// Repetir tentativas enquanto a introdução estiver visível.
+
+retryTimer = setInterval(() => {
+  if (introClosed) {
+    clearInterval(retryTimer);
+    return;
+  }
+
+  if (introVideo.paused && introVideo.readyState >= 2) {
+    playAttempts = 0;
+    playIntro();
+  }
+}, 2000);
+
+// Se o visitante retornar à aba.
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && !introClosed) {
+    playAttempts = 0;
+    playIntro();
+  }
+});
+
+// Botão para entrar diretamente no site.
+
 skipIntro.addEventListener('click', closeIntro);
 
-selectIntroVideo();
+// Iniciar carregamento.
+
+loadIntroVideo();
+
 
 /* MENU MOBILE */
 
@@ -1347,6 +1487,7 @@ navLinks.querySelectorAll('a').forEach(link => {
     menuToggle.textContent = '☰';
   });
 });
+
 
 /* DADOS DOS PRODUTOS */
 
@@ -1435,6 +1576,7 @@ const catalogos = {
     }
   ]
 };
+
 
 /* CARROSSEL COM LOOP INFINITO */
 
@@ -1607,6 +1749,7 @@ class InfiniteCarousel {
   }
 }
 
+
 /* INICIALIZA OS TRÊS CARROSSEIS */
 
 document.querySelectorAll('[data-carousel]').forEach(wrapper => {
@@ -1614,9 +1757,11 @@ document.querySelectorAll('[data-carousel]').forEach(wrapper => {
   new InfiniteCarousel(wrapper, catalogos[category]);
 });
 
+
 /* ANO AUTOMÁTICO */
 
 document.getElementById('year').textContent = new Date().getFullYear();
+
 </script>
 
 </body>
